@@ -1,0 +1,205 @@
+library(RColorBrewer)
+source("~/general.R")
+id <- function(x) "fixed"
+#wideScreen()
+
+############################################################################################################################
+### Load in population counts from the Worldbank (https://data.worldbank.org/indicator/SP.POP.TOTL)
+pop_counts_file <- "WorldBank_data/API_SP.POP.TOTL_DS2_en_csv_v2_821007/API_SP.POP.TOTL_DS2_en_csv_v2_821007.csv";
+pop_counts <- read.delim(pop_counts_file, skip=3, sep=",", header=T, as.is=T)
+
+# Correct some labels for consistency between Worldbank and CSSE data
+pop_counts[pop_counts$Country.Name=="Egypt, Arab Rep.","Country.Name"] <- "Egypt";
+pop_counts[pop_counts$Country.Name=="Macao SAR, China","Country.Name"] <- "Macau";
+pop_counts[pop_counts$Country.Name=="Hong Kong SAR, China","Country.Name"] <- "Hong Kong";
+pop_counts[pop_counts$Country.Name=="Iran, Islamic Rep.","Country.Name"] <- "Iran";
+pop_counts[pop_counts$Country.Name=="Russian Federation","Country.Name"] <- "Russia";
+pop_counts[pop_counts$Country.Name=="Korea, Rep.","Country.Name"] <- "South Korea";
+pop_counts[pop_counts$Country.Name=="China","Country.Name"] <- "Mainland China";
+pop_counts[pop_counts$Country.Name=="United States","Country.Name"] <- "US";
+pop_counts[pop_counts$Country.Name=="United Kingdom","Country.Name"] <- "UK";
+
+# Simplify data to contain only latest population estimates
+pop_counts_simple <- pop_counts[,c("Country.Name", "X2018")] #2019 is missing, so opting for 2018
+
+############################################################################################################################
+### Load in COVID-19 case data
+covid19_dir <- "COVID-19/csse_covid_19_data/csse_covid_19_time_series/"
+covid19_confirmed <- read.delim(paste(covid19_dir, "time_series_19-covid-Confirmed.csv", sep="/"), sep=",", header=T, as.is=T)
+covid19_deaths    <- read.delim(paste(covid19_dir, "time_series_19-covid-Deaths.csv",    sep="/"), sep=",", header=T, as.is=T)
+covid19_recovered <- read.delim(paste(covid19_dir, "time_series_19-covid-Recovered.csv", sep="/"), sep=",", header=T, as.is=T)
+
+# Need to pool Taiwan with Mainland China, as the Worldbank apparently does not recognize it.
+covid19_confirmed[covid19_confirmed$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
+covid19_deaths[covid19_deaths$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
+covid19_recovered[covid19_recovered$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
+covid19_confirmed[covid19_confirmed$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
+covid19_deaths[covid19_deaths$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
+covid19_recovered[covid19_recovered$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
+
+# Aggregate by country, instead of region, since we only have country-level population data for now.
+covid19_confirmed_simple <- aggregate(covid19_confirmed[,-c(1:4)], by=list(covid19_confirmed$Country.Region), FUN=sum)
+covid19_deaths_simple <- aggregate(covid19_deaths[,-c(1:4)], by=list(covid19_deaths$Country.Region), FUN=sum)
+covid19_recovered_simple <- aggregate(covid19_recovered[,-c(1:4)], by=list(covid19_recovered$Country.Region), FUN=sum)
+
+# Match population data with COVID-19 data
+match_res <- match(covid19_confirmed_simple[,1], pop_counts_simple$Country.Name)
+covid19_confirmed_pop <- cbind(pop_counts_simple[match_res,], covid19_confirmed_simple)
+covid19_deaths_pop <- cbind(pop_counts_simple[match_res,], covid19_deaths_simple)
+covid19_recovered_pop <- cbind(pop_counts_simple[match_res,], covid19_recovered_simple)
+
+## All but one country should have been matched -- the unmatched is the Diamond Princess cruise ship.
+#covid19_confirmed_pop$Country.Name[which(covid19_confirmed_pop$Group.1 == "Others")] <- "Diamond Princess"
+#covid19_deaths_pop$Country.Name[which(covid19_deaths_pop$Group.1 == "Others")] <- "Diamond Princess"
+#covid19_recovered_pop$Country.Name[which(covid19_recovered_pop$Group.1 == "Others")] <- "Diamond Princess"
+if (length(which(is.na(covid19_confirmed_pop$Country.Name))) > 1) stop("More than 1 unmatched: check it out")
+covid19_confirmed_pop <- covid19_confirmed_pop[-which(is.na(covid19_confirmed_pop$Country.Name)),]
+covid19_deaths_pop <- covid19_deaths_pop[-which(is.na(covid19_deaths_pop$Country.Name)),]
+covid19_recovered_pop <- covid19_recovered_pop[-which(is.na(covid19_recovered_pop$Country.Name)),]
+
+# Final simplification step
+covid19_confirmed_pop <- covid19_confirmed_pop[,-3]
+covid19_deaths_pop <- covid19_deaths_pop[,-3]
+covid19_recovered_pop <- covid19_recovered_pop[,-3]
+
+# Assign more meaningful column names
+colnames(covid19_confirmed_pop) <- colnames(covid19_deaths_pop) <- colnames(covid19_recovered_pop) <- 
+  c("country", "population", gsub("X", "", gsub("\\.", "/", colnames(covid19_confirmed_pop)[-c(1:2)])))
+
+############################################################################################################################
+
+### Percentage of population with confirmed cases / deaths / recoveries
+covid19_confirmed_perc <- covid19_confirmed_pop[,-c(1:2)] / covid19_confirmed_pop$population * 100
+covid19_deaths_perc <- covid19_deaths_pop[,-c(1:2)] / covid19_deaths_pop$population * 100
+covid19_recovered_perc <- covid19_recovered_pop[,-c(1:2)] / covid19_recovered_pop$population * 100
+rownames(covid19_confirmed_perc) <- rownames(covid19_deaths_perc) <- rownames(covid19_recovered_perc) <- 
+  covid19_confirmed_pop$country;
+colnames(covid19_confirmed_perc) <- colnames(covid19_deaths_perc) <- colnames(covid19_recovered_perc) <- 
+  as.Date(colnames(covid19_recovered_perc), format="%m/%d/%y")
+
+### Percentage of confirmed cases that have resulted in deaths / recoveries
+covid19_confirmed_deaths_perc <- covid19_deaths_simple[,-1] / covid19_confirmed_simple[,-1] * 100
+covid19_confirmed_recovered_perc <- covid19_recovered_simple[,-1] / covid19_confirmed_simple[,-1] * 100
+rownames(covid19_confirmed_deaths_perc) <- rownames(covid19_confirmed_recovered_perc) <- covid19_deaths_simple[,1];
+colnames(covid19_confirmed_deaths_perc) <- colnames(covid19_confirmed_recovered_perc) <- 
+  as.Date(colnames(covid19_confirmed_pop)[-(1:2)], format="%m/%d/%y")
+covid19_confirmed_deaths_perc[covid19_confirmed_simple[,-1] < 50] <- NA
+covid19_confirmed_recovered_perc[covid19_confirmed_simple[,-1] < 50] <- NA
+
+### Averages across all countries
+covid19_confirmed_perc_mean <- colSums(covid19_confirmed_pop[,-c(1:2)]) / sum(covid19_confirmed_pop[,2]) * 100
+covid19_deaths_perc_mean <- colSums(covid19_deaths_pop[,-c(1:2)]) / sum(covid19_deaths_pop[,2]) * 100
+covid19_recovered_perc_mean <- colSums(covid19_recovered_pop[,-c(1:2)]) / sum(covid19_recovered_pop[,2]) * 100
+
+covid19_confirmed_deaths_perc_mean <- colSums(covid19_deaths_simple[,-1]) / colSums(covid19_confirmed_simple[,-1]) * 100
+covid19_confirmed_recovered_perc_mean <- colSums(covid19_recovered_simple[,-1]) / colSums(covid19_confirmed_simple[,-1]) * 100
+
+# Obtain "top-scoring" countries, in terms of percentage of population affected (min. 50)
+min50 <- which(covid19_confirmed_pop[,ncol(covid19_confirmed_pop)] > 50)
+#idxs <- head(order(-covid19_confirmed_perc[,ncol(covid19_confirmed_perc)]), 9)
+idxs <- head(intersect(order(-covid19_confirmed_perc[,ncol(covid19_confirmed_perc)]), min50), 9)
+cols <- brewer.pal(9, "Set1")
+
+plotfile("percentage_population_confirmed_top9_min50", type="pdf", width=14, height=8)
+par(mar=c(2,4,1,5))
+# Confirmed cases
+plot(as.Date(colnames(covid19_confirmed_perc)), rep(0, ncol(covid19_confirmed_perc)), type="n", 
+     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_perc[idxs,])), xlab="", ylab="")
+lines(as.Date(colnames(covid19_confirmed_perc)), covid19_confirmed_perc_mean, col="black", lwd=5)
+for (i in 1:length(idxs)) {
+  lines(as.Date(colnames(covid19_confirmed_perc)), covid19_confirmed_perc[idxs[i],], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_recovered_perc)), tcl=-0.25)
+axis(4, las=2)
+mtext("% of population", side=2, line=0.5)
+legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+legend("topleft", "(x,y)", c(rownames(covid19_confirmed_perc)[idxs], "World-wide"), lwd=5, 
+       col=c(cols, "black"), inset=c(0.01, 0.05), bty="n")
+box()
+dev.off()
+
+plotfile("percentage_population_deaths_recovered_top9_min50", type="pdf", width=14, height=4)
+par(mar=c(2,4,1,5), mfrow=c(1,2), cex=2)
+# Deaths
+plot(as.Date(colnames(covid19_deaths_perc)), rep(0, ncol(covid19_deaths_perc)), type="n", 
+     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_deaths_perc[idxs,])), xlab="", ylab="")
+lines(as.Date(colnames(covid19_deaths_perc)), covid19_deaths_perc_mean, col="black", lwd=5)
+for (i in 1:length(idxs)) {
+  lines(as.Date(colnames(covid19_deaths_perc)), covid19_deaths_perc[idxs[i],], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_recovered_perc)), tcl=-0.25)
+axis(4, las=2)
+mtext("% of population", side=2, line=0.5, cex=2)
+legend("topleft", "(x,y)", "Deaths", inset=c(-0.02,0.005), bty="n", cex=1, text.font=4)
+box()
+# Recovered
+plot(as.Date(colnames(covid19_recovered_perc)), rep(0, ncol(covid19_recovered_perc)), type="n", 
+     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_recovered_perc[idxs,])), xlab="", ylab="")
+lines(as.Date(colnames(covid19_recovered_perc)), covid19_recovered_perc_mean, col="black", lwd=5)
+for (i in 1:length(idxs)) {
+  lines(as.Date(colnames(covid19_recovered_perc)), covid19_recovered_perc[idxs[i],], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_recovered_perc)), tcl=-0.25)
+axis(4, las=2)
+mtext("% of population", side=2, line=0.5, cex=2)
+legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+box()
+dev.off()
+
+plotfile("percentage_cases_deaths_recovered_top9_min50", type="pdf", width=14, height=4)
+par(mar=c(2,4,1,5), mfrow=c(1,2), cex=2)
+# Plot percentage of cases resulting in deaths
+plot(as.Date(colnames(covid19_confirmed_deaths_perc)), rep(0, ncol(covid19_confirmed_deaths_perc)), type="n", 
+     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_deaths_perc, na.rm=T)), xlab="", ylab="")
+lines(as.Date(colnames(covid19_confirmed_deaths_perc)), covid19_confirmed_deaths_perc_mean, col="black", lwd=5)
+for (i in 1:length(idxs)) {
+  idx <- rownames(covid19_confirmed_perc)[idxs[i]]
+  lines(as.Date(colnames(covid19_confirmed_deaths_perc)), covid19_confirmed_deaths_perc[idx,], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_deaths_perc)), tcl=-0.25)
+axis(4, las=2)
+mtext("% of confirmed cases", side=2, line=0.5, cex=2)
+legend("topleft", "(x,y)", "Deaths", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+box()
+
+# Plot percentage of cases resulting in recovery
+plot(as.Date(colnames(covid19_confirmed_recovered_perc)), rep(0, ncol(covid19_confirmed_recovered_perc)), type="n", 
+     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_recovered_perc, na.rm=T)), xlab="", ylab="")
+lines(as.Date(colnames(covid19_confirmed_recovered_perc)), covid19_confirmed_recovered_perc_mean, col="black", lwd=5)
+for (i in 1:length(idxs)) {
+  idx <- rownames(covid19_confirmed_perc)[idxs[i]]
+  lines(as.Date(colnames(covid19_confirmed_recovered_perc)), covid19_confirmed_recovered_perc[idx,], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_recovered_perc)), tcl=-0.25)
+axis(4, las=2)
+mtext("% of confirmed cases", side=2, line=0.5, cex=2)
+legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+box()
+
+dev.off()
+
+###
+
+plotfile("absolute_numbers_top9_min50", type="pdf", width=14, height=8)
+par(mar=c(2,4,1,5))
+# Confirmed cases
+covid19_confirmed_abs <- covid19_confirmed_pop[,-c(1:2)]
+rownames(covid19_confirmed_abs) <- covid19_confirmed_pop$country;
+colnames(covid19_confirmed_abs) <- as.Date(colnames(covid19_confirmed_abs), format="%m/%d/%y")
+covid19_confirmed_abs[covid19_confirmed_abs==0] <- NA
+plot(as.Date(colnames(covid19_confirmed_abs)), rep(1, ncol(covid19_confirmed_abs)), type="n", log="y",
+     yaxt="n", xaxs="i", yaxs="i", ylim=c(1, max(covid19_confirmed_abs[idxs,], na.rm=T)), xlab="", ylab="")
+for (i in 1:length(idxs)) {
+  lines(as.Date(colnames(covid19_confirmed_abs)), covid19_confirmed_abs[idxs[i],], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_abs)), tcl=-0.25)
+axis(4, las=2)
+mtext("# of confirmed cases", side=2, line=0.5)
+legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+legend("topleft", "(x,y)", rownames(covid19_confirmed_abs)[idxs], lwd=5, 
+       col=cols, inset=c(0.01, 0.05), bty="n")
+box()
+dev.off()
+
+
+
