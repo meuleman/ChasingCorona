@@ -1,7 +1,32 @@
 library(RColorBrewer)
-source("~/general.R")
-id <- function(x) "fixed"
+#source("~/general.R")
+#id <- function(x) "fixed"
 #wideScreen()
+
+############################################################################################################################
+### Function for format-agnostic plotting -- always comes out looking the same!
+plotfile <- function(filename="Rplot", type="png", width=7, height=7, device="bitmap", warn=TRUE) {
+  format <- switch(type,
+            pdf = "pdfwrite",
+            png = "png16m",
+            type);
+
+  if (device == "bitmap") {
+    bitmap(file=paste(filename, "_", id(), ".", type, sep=""),
+           type=format, res=144, taa=ifelse(type=="png16m", 4, NA), width=width, height=height)
+  } else {
+    eval(parse(text=device))(file=paste(filename, "_", id(), ".", type, sep=""),
+                             res=144, width=width, height=height)
+  }
+
+  if (warn) print("Do not forget to use 'dev.off()' afterwards!")
+}
+
+### Function for generating a initial + date string ("WM" hardcoded -- Wouter Meuleman)
+id <- function() paste("WM", gsub("-", "", Sys.Date()), sep="")
+
+figdir <- "PDF_figures";
+dir.create(figdir, recursive=TRUE, showWarnings=FALSE)
 
 ############################################################################################################################
 ### Load in population counts from the Worldbank (https://data.worldbank.org/indicator/SP.POP.TOTL)
@@ -36,6 +61,9 @@ covid19_recovered[covid19_recovered$Country.Region=="Taiwan","Country.Region"] <
 covid19_confirmed[covid19_confirmed$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
 covid19_deaths[covid19_deaths$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
 covid19_recovered[covid19_recovered$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
+covid19_confirmed[covid19_confirmed$Country.Region=="Palestine","Country.Region"] <- "Israel"; # Same for Saint Barthelemy
+covid19_deaths[covid19_deaths$Country.Region=="Palestine","Country.Region"] <- "Israel"; # Same for Saint Barthelemy
+covid19_recovered[covid19_recovered$Country.Region=="Palestine","Country.Region"] <- "Israel"; # Same for Saint Barthelemy
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 covid19_confirmed_simple <- aggregate(covid19_confirmed[,-c(1:4)], by=list(covid19_confirmed$Country.Region), FUN=sum)
@@ -86,6 +114,9 @@ colnames(covid19_confirmed_deaths_perc) <- colnames(covid19_confirmed_recovered_
 covid19_confirmed_deaths_perc[covid19_confirmed_simple[,-1] < 50] <- NA
 covid19_confirmed_recovered_perc[covid19_confirmed_simple[,-1] < 50] <- NA
 
+### Construct date string for showing in figures.
+string_date <- format(as.Date(tail(colnames(covid19_confirmed_perc), 1)), format="%B %d, %Y")
+
 ### Averages across all countries
 covid19_confirmed_perc_mean <- colSums(covid19_confirmed_pop[,-c(1:2)]) / sum(covid19_confirmed_pop[,2]) * 100
 covid19_deaths_perc_mean <- colSums(covid19_deaths_pop[,-c(1:2)]) / sum(covid19_deaths_pop[,2]) * 100
@@ -100,11 +131,13 @@ min50 <- which(covid19_confirmed_pop[,ncol(covid19_confirmed_pop)] > 50)
 idxs <- head(intersect(order(-covid19_confirmed_perc[,ncol(covid19_confirmed_perc)]), min50), 9)
 cols <- brewer.pal(9, "Set1")
 
-plotfile("percentage_population_confirmed_top9_min50", type="pdf", width=14, height=8)
+fn <- "percentage_population_confirmed_top9_min50"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 par(mar=c(2,4,1,5))
 # Confirmed cases
-plot(as.Date(colnames(covid19_confirmed_perc)), rep(0, ncol(covid19_confirmed_perc)), type="n", 
-     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_perc[idxs,])), xlab="", ylab="")
+plot(as.Date(colnames(covid19_confirmed_perc)), rep(0, ncol(covid19_confirmed_perc)), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_perc[idxs,])), 
+     xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(covid19_confirmed_perc)), covid19_confirmed_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(covid19_confirmed_perc)), covid19_confirmed_perc[idxs[i],], col=cols[i], lwd=5)
@@ -117,12 +150,17 @@ legend("topleft", "(x,y)", c(rownames(covid19_confirmed_perc)[idxs], "World-wide
        col=c(cols, "black"), inset=c(0.01, 0.05), bty="n")
 box()
 dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  system(paste("convert ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+}
 
-plotfile("percentage_population_deaths_recovered_top9_min50", type="pdf", width=14, height=4)
+fn <- "percentage_population_deaths_recovered_top9_min50"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
 par(mar=c(2,4,1,5), mfrow=c(1,2), cex=2)
 # Deaths
-plot(as.Date(colnames(covid19_deaths_perc)), rep(0, ncol(covid19_deaths_perc)), type="n", 
-     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_deaths_perc[idxs,])), xlab="", ylab="")
+plot(as.Date(colnames(covid19_deaths_perc)), rep(0, ncol(covid19_deaths_perc)), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_deaths_perc[idxs,])), 
+     xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(covid19_deaths_perc)), covid19_deaths_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(covid19_deaths_perc)), covid19_deaths_perc[idxs[i],], col=cols[i], lwd=5)
@@ -133,8 +171,9 @@ mtext("% of population", side=2, line=0.5, cex=2)
 legend("topleft", "(x,y)", "Deaths", inset=c(-0.02,0.005), bty="n", cex=1, text.font=4)
 box()
 # Recovered
-plot(as.Date(colnames(covid19_recovered_perc)), rep(0, ncol(covid19_recovered_perc)), type="n", 
-     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_recovered_perc[idxs,])), xlab="", ylab="")
+plot(as.Date(colnames(covid19_recovered_perc)), rep(0, ncol(covid19_recovered_perc)), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_recovered_perc[idxs,])), 
+     xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(covid19_recovered_perc)), covid19_recovered_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(covid19_recovered_perc)), covid19_recovered_perc[idxs[i],], col=cols[i], lwd=5)
@@ -145,12 +184,17 @@ mtext("% of population", side=2, line=0.5, cex=2)
 legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
 box()
 dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  system(paste("convert ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+}
 
-plotfile("percentage_cases_deaths_recovered_top9_min50", type="pdf", width=14, height=4)
+fn <- "percentage_cases_deaths_recovered_top9_min50"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
 par(mar=c(2,4,1,5), mfrow=c(1,2), cex=2)
 # Plot percentage of cases resulting in deaths
-plot(as.Date(colnames(covid19_confirmed_deaths_perc)), rep(0, ncol(covid19_confirmed_deaths_perc)), type="n", 
-     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_deaths_perc, na.rm=T)), xlab="", ylab="")
+plot(as.Date(colnames(covid19_confirmed_deaths_perc)), rep(0, ncol(covid19_confirmed_deaths_perc)), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_deaths_perc, na.rm=T)), 
+     xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(covid19_confirmed_deaths_perc)), covid19_confirmed_deaths_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
   idx <- rownames(covid19_confirmed_perc)[idxs[i]]
@@ -161,10 +205,10 @@ axis(4, las=2)
 mtext("% of confirmed cases", side=2, line=0.5, cex=2)
 legend("topleft", "(x,y)", "Deaths", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
 box()
-
 # Plot percentage of cases resulting in recovery
-plot(as.Date(colnames(covid19_confirmed_recovered_perc)), rep(0, ncol(covid19_confirmed_recovered_perc)), type="n", 
-     yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_recovered_perc, na.rm=T)), xlab="", ylab="")
+plot(as.Date(colnames(covid19_confirmed_recovered_perc)), rep(0, ncol(covid19_confirmed_recovered_perc)), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_recovered_perc, na.rm=T)), 
+     xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(covid19_confirmed_recovered_perc)), covid19_confirmed_recovered_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
   idx <- rownames(covid19_confirmed_perc)[idxs[i]]
@@ -175,20 +219,24 @@ axis(4, las=2)
 mtext("% of confirmed cases", side=2, line=0.5, cex=2)
 legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
 box()
-
 dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  system(paste("convert ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+}
 
 ###
 
-plotfile("absolute_numbers_top9_min50", type="pdf", width=14, height=8)
+fn <- "absolute_numbers_top9_min50"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 par(mar=c(2,4,1,5))
 # Confirmed cases
 covid19_confirmed_abs <- covid19_confirmed_pop[,-c(1:2)]
 rownames(covid19_confirmed_abs) <- covid19_confirmed_pop$country;
 colnames(covid19_confirmed_abs) <- as.Date(colnames(covid19_confirmed_abs), format="%m/%d/%y")
 covid19_confirmed_abs[covid19_confirmed_abs==0] <- NA
-plot(as.Date(colnames(covid19_confirmed_abs)), rep(1, ncol(covid19_confirmed_abs)), type="n", log="y",
-     yaxt="n", xaxs="i", yaxs="i", ylim=c(1, max(covid19_confirmed_abs[idxs,], na.rm=T)), xlab="", ylab="")
+plot(as.Date(colnames(covid19_confirmed_abs)), rep(1, ncol(covid19_confirmed_abs)), type="n", 
+     log="y", yaxt="n", xaxs="i", yaxs="i", ylim=c(1, max(covid19_confirmed_abs[idxs,], na.rm=T)), 
+     xlab="", ylab="", main=string_date)
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(covid19_confirmed_abs)), covid19_confirmed_abs[idxs[i],], col=cols[i], lwd=5)
 }
@@ -200,6 +248,9 @@ legend("topleft", "(x,y)", rownames(covid19_confirmed_abs)[idxs], lwd=5,
        col=cols, inset=c(0.01, 0.05), bty="n")
 box()
 dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  system(paste("convert ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+}
 
 
 
