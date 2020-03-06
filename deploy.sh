@@ -1,5 +1,7 @@
 cd COVID-19
-git pull
+git fetch upstream
+git checkout master
+git merge upstream/master
 cd ..
 
 R CMD batch --vanilla code_generate_figures.R
