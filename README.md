@@ -1,6 +1,6 @@
 # ChasingCorona
 
-#### Expressing COVID-19 infection cases as a fraction of the population
+### Expressing COVID-19 infection cases as a fraction of the population
 
 More information here: https://www.meuleman.org/project/chasingcorona/
 
