@@ -147,7 +147,7 @@ for (i in 1:length(idxs)) {
 axis(1, labels=F, at=as.Date(colnames(covid19_recovered_perc)), tcl=-0.25)
 axis(4, las=2)
 mtext("% of population", side=2, line=0.5)
-legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.01,0.005), bty="n", cex=2, text.font=4)
 legend("topleft", "(x,y)", c(rownames(covid19_confirmed_perc)[idxs], "World-wide"), lwd=5, 
        col=c(cols, "black"), inset=c(0.01, 0.05), bty="n")
 box()
@@ -158,7 +158,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 
 fn <- "percentage_population_deaths_recovered_top9_min50"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
-par(mar=c(2,4,1,5), mfrow=c(1,2), cex=2)
+par(mar=c(2,4,1,5), mfrow=c(1,2), cex=3)
 # Deaths
 plot(as.Date(colnames(covid19_deaths_perc)), rep(0, ncol(covid19_deaths_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_deaths_perc[idxs,])), 
@@ -169,8 +169,8 @@ for (i in 1:length(idxs)) {
 }
 axis(1, labels=F, at=as.Date(colnames(covid19_recovered_perc)), tcl=-0.25)
 axis(4, las=2)
-mtext("% of population", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Deaths", inset=c(-0.02,0.005), bty="n", cex=1, text.font=4)
+mtext("% of population", side=2, line=0.5, cex=3)
+legend("topleft", "(x,y)", "Deaths", inset=c(-0.02,0.005), bty="n", cex=2, text.font=4)
 box()
 # Recovered
 plot(as.Date(colnames(covid19_recovered_perc)), rep(0, ncol(covid19_recovered_perc)), 
@@ -182,8 +182,8 @@ for (i in 1:length(idxs)) {
 }
 axis(1, labels=F, at=as.Date(colnames(covid19_recovered_perc)), tcl=-0.25)
 axis(4, las=2)
-mtext("% of population", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+mtext("% of population", side=2, line=0.5, cex=3)
+legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=2, text.font=4)
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
@@ -192,7 +192,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 
 fn <- "percentage_cases_deaths_recovered_top9_min50"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
-par(mar=c(2,4,1,5), mfrow=c(1,2), cex=2)
+par(mar=c(2,4,1,5), mfrow=c(1,2), cex=3)
 # Plot percentage of cases resulting in deaths
 plot(as.Date(colnames(covid19_confirmed_deaths_perc)), rep(0, ncol(covid19_confirmed_deaths_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_deaths_perc, na.rm=T)), 
@@ -204,8 +204,8 @@ for (i in 1:length(idxs)) {
 }
 axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_deaths_perc)), tcl=-0.25)
 axis(4, las=2)
-mtext("% of confirmed cases", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Deaths", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+mtext("% of confirmed cases", side=2, line=0.5, cex=3)
+legend("topleft", "(x,y)", "Deaths", inset=c(-0.01,0.005), bty="n", cex=2, text.font=4)
 box()
 # Plot percentage of cases resulting in recovery
 plot(as.Date(colnames(covid19_confirmed_recovered_perc)), rep(0, ncol(covid19_confirmed_recovered_perc)), 
@@ -218,8 +218,8 @@ for (i in 1:length(idxs)) {
 }
 axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_recovered_perc)), tcl=-0.25)
 axis(4, las=2)
-mtext("% of confirmed cases", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+mtext("% of confirmed cases", side=2, line=0.5, cex=3)
+legend("topleft", "(x,y)", "Recovered", inset=c(-0.01,0.005), bty="n", cex=2, text.font=4)
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
@@ -244,7 +244,7 @@ for (i in 1:length(idxs)) {
 axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_abs)), tcl=-0.25)
 axis(4, las=2)
 mtext("# of confirmed cases", side=2, line=0.5)
-legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.01,0.005), bty="n", cex=1, text.font=4)
+legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.01,0.005), bty="n", cex=2, text.font=4)
 legend("topleft", "(x,y)", rownames(covid19_confirmed_abs)[idxs], lwd=5, 
        col=cols, inset=c(0.01, 0.05), bty="n")
 box()
