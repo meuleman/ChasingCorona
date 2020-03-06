@@ -58,12 +58,14 @@ covid19_recovered <- read.delim(paste(covid19_dir, "time_series_19-covid-Recover
 covid19_confirmed[covid19_confirmed$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
 covid19_deaths[covid19_deaths$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
 covid19_recovered[covid19_recovered$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
-covid19_confirmed[covid19_confirmed$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
-covid19_deaths[covid19_deaths$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
-covid19_recovered[covid19_recovered$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; # Same for Saint Barthelemy
-covid19_confirmed[covid19_confirmed$Country.Region=="Palestine","Country.Region"] <- "Israel"; # Same for Saint Barthelemy
-covid19_deaths[covid19_deaths$Country.Region=="Palestine","Country.Region"] <- "Israel"; # Same for Saint Barthelemy
-covid19_recovered[covid19_recovered$Country.Region=="Palestine","Country.Region"] <- "Israel"; # Same for Saint Barthelemy
+# Same for Saint Barthelemy
+covid19_confirmed[covid19_confirmed$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
+covid19_deaths[covid19_deaths$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
+covid19_recovered[covid19_recovered$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
+# Same for Palestine
+covid19_confirmed[covid19_confirmed$Country.Region=="Palestine","Country.Region"] <- "Israel"; 
+covid19_deaths[covid19_deaths$Country.Region=="Palestine","Country.Region"] <- "Israel";
+covid19_recovered[covid19_recovered$Country.Region=="Palestine","Country.Region"] <- "Israel"; 
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 covid19_confirmed_simple <- aggregate(covid19_confirmed[,-c(1:4)], by=list(covid19_confirmed$Country.Region), FUN=sum)
@@ -133,7 +135,7 @@ cols <- brewer.pal(9, "Set1")
 
 fn <- "percentage_population_confirmed_top9_min50"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-par(mar=c(2,4,1,5))
+par(mar=c(2,4,1,5), bg="white")
 # Confirmed cases
 plot(as.Date(colnames(covid19_confirmed_perc)), rep(0, ncol(covid19_confirmed_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(covid19_confirmed_perc[idxs,])), 
@@ -224,8 +226,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
-###
-
+# Plot absolute number of confirmed cases for each of the top 9 countries
 fn <- "absolute_numbers_top9_min50"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 par(mar=c(2,4,1,5))
