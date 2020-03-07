@@ -43,6 +43,8 @@ pop_counts[pop_counts$Country.Name=="Korea, Rep.","Country.Name"] <- "South Kore
 pop_counts[pop_counts$Country.Name=="China","Country.Name"] <- "Mainland China";
 pop_counts[pop_counts$Country.Name=="United States","Country.Name"] <- "US";
 pop_counts[pop_counts$Country.Name=="United Kingdom","Country.Name"] <- "UK";
+pop_counts[pop_counts$Country.Name=="Slovak Republic","Country.Name"] <- "Slovakia";
+pop_counts[pop_counts$Country.Name=="Vatican City","Country.Name"] <- "Italy";
 
 # Simplify data to contain only latest population estimates
 pop_counts_simple <- pop_counts[,c("Country.Name", "X2018")] #2019 is missing, so opting for 2018
