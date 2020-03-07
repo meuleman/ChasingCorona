@@ -1,7 +1,7 @@
 
 ## First add a hook to the upstream (original) repository:
 cd COVID-19
-git remote add upstream https://github.com/meuleman/COVID-19.git
+git remote add upstream https://github.com/CSSEGISandData/COVID-19.git
 cd ..
 ## As per: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/configuring-a-remote-for-a-fork
 
