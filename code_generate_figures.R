@@ -44,7 +44,6 @@ pop_counts[pop_counts$Country.Name=="China","Country.Name"] <- "Mainland China";
 pop_counts[pop_counts$Country.Name=="United States","Country.Name"] <- "US";
 pop_counts[pop_counts$Country.Name=="United Kingdom","Country.Name"] <- "UK";
 pop_counts[pop_counts$Country.Name=="Slovak Republic","Country.Name"] <- "Slovakia";
-pop_counts[pop_counts$Country.Name=="Vatican City","Country.Name"] <- "Italy";
 
 # Simplify data to contain only latest population estimates
 pop_counts_simple <- pop_counts[,c("Country.Name", "X2018")] #2019 is missing, so opting for 2018
@@ -68,6 +67,10 @@ covid19_recovered[covid19_recovered$Country.Region=="Saint Barthelemy","Country.
 covid19_confirmed[covid19_confirmed$Country.Region=="Palestine","Country.Region"] <- "Israel"; 
 covid19_deaths[covid19_deaths$Country.Region=="Palestine","Country.Region"] <- "Israel";
 covid19_recovered[covid19_recovered$Country.Region=="Palestine","Country.Region"] <- "Israel"; 
+# Same for Vatican City
+covid19_confirmed[covid19_confirmed$Country.Region=="Vatican City","Country.Region"] <- "Italy";
+covid19_deaths[covid19_deaths$Country.Region=="Vatican City","Country.Region"] <- "Italy";
+covid19_recovered[covid19_recovered$Country.Region=="Vatican City","Country.Region"] <- "Italy";
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 covid19_confirmed_simple <- aggregate(covid19_confirmed[,-c(1:4)], by=list(covid19_confirmed$Country.Region), FUN=sum)
