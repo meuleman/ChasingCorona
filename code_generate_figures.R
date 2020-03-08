@@ -258,5 +258,40 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
+# Plot percentage weekly increase in confirmed cases, for each of (a new set of) top 9 countries
+fn <- "percentage_weekly_change_cases_confirmed_newtop9_min50"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
+par(mar=c(2,3,1,4), bg="white", cex=2)
+# Confirmed cases, percent change per day
+covid19_confirmed <- read.delim(paste(covid19_dir, "time_series_19-covid-Confirmed.csv", sep="/"), sep=",", header=T, as.is=T)
+covid19_confirmed_min50 <- covid19_confirmed[, -c(1:4)]
+covid19_confirmed_min50[covid19_confirmed_min50 < 50] <- NA # a minimum of 10 cases per region/country
+n <- ncol(covid19_confirmed_min50);
+#i <- which(covid19_confirmed$Country.Region=="XXX")
+#covid19_confirmed_perc_diff <- t(apply(covid19_confirmed_min50, 1, diff, lag=1)) / covid19_confirmed_min50[,-n] * 100
+covid19_confirmed_perc_diff <- (t(apply(covid19_confirmed_min50, 1, diff, lag=7)) / covid19_confirmed_min50[,-c((n-6):n)]) * 100
+rownames(covid19_confirmed_perc_diff) <- gsub("^ - ", "", paste(covid19_confirmed$Province.State, covid19_confirmed$Country.Region, sep=" - "))
+colnames(covid19_confirmed_perc_diff) <- as.Date(gsub("X", "", gsub("\\.", "/", tail(colnames(covid19_confirmed_min50), -7))), format="%m/%d/%y")
+idxs <- head(order(apply(covid19_confirmed_perc_diff, 1, median, na.rm=T), decreasing=TRUE), 9)
+plot(as.Date(colnames(covid19_confirmed_perc_diff)), rep(1, ncol(covid19_confirmed_perc_diff)), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=range(covid19_confirmed_perc_diff[idxs,], na.rm=T), 
+     xlab="", ylab="", main=string_date)
+for (i in 1:length(idxs)) {
+  lines(as.Date(colnames(covid19_confirmed_perc_diff)), covid19_confirmed_perc_diff[idxs[i],], col=cols[i], lwd=5)
+}
+axis(1, labels=F, at=as.Date(colnames(covid19_confirmed_perc_diff)), tcl=-0.25)
+axis(4, las=2)
+mtext("weekly % increase in confirmed cases", side=2, line=0.5, cex=2)
+legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
+legend("topleft", "(x,y)", rownames(covid19_confirmed_perc_diff)[idxs], lwd=5, 
+       col=cols, inset=c(0.01, 0.1), bty="n")
+box()
+dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+}
+
+
+
 
 
