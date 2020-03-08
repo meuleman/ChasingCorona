@@ -71,6 +71,14 @@ covid19_recovered[covid19_recovered$Country.Region=="Palestine","Country.Region"
 covid19_confirmed[covid19_confirmed$Country.Region=="Vatican City","Country.Region"] <- "Italy";
 covid19_deaths[covid19_deaths$Country.Region=="Vatican City","Country.Region"] <- "Italy";
 covid19_recovered[covid19_recovered$Country.Region=="Vatican City","Country.Region"] <- "Italy";
+# Same for Martinique
+covid19_confirmed[covid19_confirmed$Country.Region=="Martinique","Country.Region"] <- "France";
+covid19_deaths[covid19_deaths$Country.Region=="Martinique","Country.Region"] <- "France";
+covid19_recovered[covid19_recovered$Country.Region=="Martinique","Country.Region"] <- "France";
+# Same for French Guiana
+covid19_confirmed[covid19_confirmed$Country.Region=="French Guiana","Country.Region"] <- "France";
+covid19_deaths[covid19_deaths$Country.Region=="French Guiana","Country.Region"] <- "France";
+covid19_recovered[covid19_recovered$Country.Region=="French Guiana","Country.Region"] <- "France";
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 covid19_confirmed_simple <- aggregate(covid19_confirmed[,-c(1:4)], by=list(covid19_confirmed$Country.Region), FUN=sum)
