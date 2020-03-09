@@ -79,6 +79,10 @@ covid19_recovered[covid19_recovered$Country.Region=="Martinique","Country.Region
 covid19_confirmed[covid19_confirmed$Country.Region=="French Guiana","Country.Region"] <- "France";
 covid19_deaths[covid19_deaths$Country.Region=="French Guiana","Country.Region"] <- "France";
 covid19_recovered[covid19_recovered$Country.Region=="French Guiana","Country.Region"] <- "France";
+# Double-registered Ireland?
+covid19_confirmed[covid19_confirmed$Country.Region=="Republic of Ireland","Country.Region"] <- "Ireland";
+covid19_deaths[covid19_deaths$Country.Region=="Republic of Ireland","Country.Region"] <- "Ireland";
+covid19_recovered[covid19_recovered$Country.Region=="Republic of Ireland","Country.Region"] <- "Ireland";
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 covid19_confirmed_simple <- aggregate(covid19_confirmed[,-c(1:4)], by=list(covid19_confirmed$Country.Region), FUN=sum)
@@ -95,7 +99,10 @@ covid19_recovered_pop <- cbind(pop_counts_simple[match_res,], covid19_recovered_
 #covid19_confirmed_pop$Country.Name[which(covid19_confirmed_pop$Group.1 == "Others")] <- "Diamond Princess"
 #covid19_deaths_pop$Country.Name[which(covid19_deaths_pop$Group.1 == "Others")] <- "Diamond Princess"
 #covid19_recovered_pop$Country.Name[which(covid19_recovered_pop$Group.1 == "Others")] <- "Diamond Princess"
-if (length(which(is.na(covid19_confirmed_pop$Country.Name))) > 1) stop("More than 1 unmatched: check it out")
+if (length(which(is.na(covid19_confirmed_pop$Country.Name))) > 1) {
+  print(covid19_confirmed_pop[which(is.na(covid19_confirmed_pop$Country.Name)),1:3])
+  stop("More than 1 unmatched: check it out")
+}
 covid19_confirmed_pop <- covid19_confirmed_pop[-which(is.na(covid19_confirmed_pop$Country.Name)),]
 covid19_deaths_pop <- covid19_deaths_pop[-which(is.na(covid19_deaths_pop$Country.Name)),]
 covid19_recovered_pop <- covid19_recovered_pop[-which(is.na(covid19_recovered_pop$Country.Name)),]
