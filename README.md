@@ -2,7 +2,14 @@
 
 ### Expressing COVID-19 infection cases as a percentage of the population
 
+I was interested in seeing what perecentage of the population is (confirmed to be) affected by the COVID-19 coronavirus,
+so I downloaded data on confirmed cases and normalized with per-country population estimates.
+
+Figure gets updated daily as long as data remain available (h/t @JHUSystems).
 More information here: https://www.meuleman.org/project/chasingcorona/
+
+DISCLAIMER: I am not a virologist or epidemiologist – I realize there are many caveats to interpreting these data.
+We do not have nearly enough data to make precise estimates, in particular because the relatively small number of tests performed in most countries.
 
 ![perc. of population confirmed](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/percentage_population_confirmed_top9_min50_latest.png "% of per-country population that are confirmed cases")
 
