@@ -23,6 +23,7 @@ That said, for the sake of completeness I include them here.
 
 ![perc. of cases death or recovered](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/percentage_cases_deaths_recovered_top9_min50_latest.png "% of per-country cases that has died or recovered from COVID-19")
 
+Number of confirmed cases on a log scale:
 ![number of confirmed cases per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/absolute_numbers_top9_min50_latest.png "number of confirmed COVID-19 cases per country")
 
 
