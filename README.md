@@ -14,8 +14,9 @@ We do not nearly have enough data to make precise estimates, in particular becau
 ![perc. of population confirmed](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/percentage_population_confirmed_top9_min50_latest.png "% of per-country population that are confirmed cases")
 
 ### Additional figures
-The following figures are even harder to interpret than the one shown above.\
-In particular, the percentage of confirmed cases resulting in death is heavily skewed upwards because of the lack of tests performed in the general population.
+The following figures are even harder to interpret than the one shown above.
+In particular, the percentage of confirmed cases resulting in death is heavily skewed upwards 
+because of the lack of tests performed in the general population.\
 That said, for the sake of completeness I include them here.
 
 ![perc. of population death or recovered](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/percentage_population_deaths_recovered_top9_min50_latest.png "% of per-country population that has died or recovered from COVID-19")
