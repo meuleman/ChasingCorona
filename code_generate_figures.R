@@ -166,7 +166,7 @@ legend("topleft", "(x,y)", c(rownames(covid19_confirmed_perc)[idxs], "World-wide
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
 fn <- "percentage_population_deaths_recovered_top9_min50"
@@ -200,7 +200,7 @@ legend("topleft", "(x,y)", "Recovered", inset=c(-0.05,0.005), bty="n", cex=1.25,
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
 fn <- "percentage_cases_deaths_recovered_top9_min50"
@@ -236,7 +236,7 @@ legend("topleft", "(x,y)", "Recovered", inset=c(-0.05,0.005), bty="n", cex=1.25,
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
 # Plot absolute number of confirmed cases for each of the top 9 countries
@@ -263,7 +263,7 @@ legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
 # Plot percentage weekly increase in confirmed cases, for each of (a new set of) top 9 countries
@@ -296,7 +296,7 @@ legend("topleft", "(x,y)", rownames(covid19_confirmed_perc_diff)[idxs], lwd=5,
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 400 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
 }
 
 
