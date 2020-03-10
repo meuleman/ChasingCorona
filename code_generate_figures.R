@@ -18,9 +18,6 @@ confirmed_recovered_perc <- recovered / confirmed * 100
 confirmed_deaths_perc[confirmed < 50] <- NA # minimum of 50 cases required
 confirmed_recovered_perc[confirmed < 50] <- NA # minimum of 50 cases required
 
-### Construct date string for showing in figures.
-string_date <- format(as.Date(tail(colnames(confirmed_perc), 1)), format="%B %d, %Y")
-
 ### Averages across all countries
 confirmed_perc_mean <- colSums(confirmed) / sum(population) * 100
 deaths_perc_mean <- colSums(deaths) / sum(population) * 100
