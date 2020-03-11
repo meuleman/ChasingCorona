@@ -30,7 +30,7 @@ Number of confirmed cases on a logarithmic scale:
 ![number of confirmed cases per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_top20_min100_log_latest.png "number of confirmed COVID-19 cases per country")
 
 Population-normalized view for King County, Washington State (where I live) and the Netherlands (where my family lives):
-![perc. of population confirmed, selection](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_confirmed_top20_min100_custom_latest.png.png "% of per-country population that are confirmed cases, selection")
+![perc. of population confirmed, selection](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_confirmed_custom_latest.png.png "% of per-country population that are confirmed cases, selection")
 
 
 
