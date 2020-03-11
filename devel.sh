@@ -10,8 +10,8 @@ cd ..
 ## or!
 #git pull origin master
 
-#R CMD batch --vanilla code_global.R
-#R CMD batch --vanilla code_selection.R
+R CMD batch --vanilla code_global.R
+R CMD batch --vanilla code_selection.R
 
 git add .
 git commit -m "Code development"
