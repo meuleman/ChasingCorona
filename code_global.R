@@ -1,9 +1,13 @@
+############################################################################################################################
+### Code for plotting COVID-19 case counts across countries
+############################################################################################################################
 library(RColorBrewer)
 source("code_preprocess.R")
 
 ### Output directory
 figdir <- "PDF_figures";
 dir.create(figdir, recursive=TRUE, showWarnings=FALSE)
+dir.create("PNG_figures", recursive=TRUE, showWarnings=FALSE)
 
 ############################################################################################################################
 
@@ -32,6 +36,8 @@ min50 <- which(confirmed[,ncol(confirmed)] > 50)
 idxs <- head(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min50), 9)
 cols <- brewer.pal(9, "Set1")
 
+############################################################################################################################
+
 fn <- "percentage_population_confirmed_top9_min50"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 par(mar=c(2,4,1,5), bg="white", cex=2)
@@ -52,7 +58,7 @@ legend("topleft", "(x,y)", c(rownames(confirmed_perc)[idxs], "World-wide"), lwd=
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
 fn <- "percentage_population_deaths_recovered_top9_min50"
@@ -86,7 +92,7 @@ legend("topleft", "(x,y)", "Recovered", inset=c(-0.05,0.005), bty="n", cex=1.25,
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
 fn <- "percentage_cases_deaths_recovered_top9_min50"
@@ -122,7 +128,7 @@ legend("topleft", "(x,y)", "Recovered", inset=c(-0.05,0.005), bty="n", cex=1.25,
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
 # Plot absolute number of confirmed cases for each of the top 9 countries
@@ -145,7 +151,7 @@ legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf ", fn, "_latest.png", sep=""))
+  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
 

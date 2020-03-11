@@ -5,7 +5,7 @@ git merge upstream/master
 git push
 cd ..
 
-R CMD batch --vanilla code_generate_figures.R
+R CMD batch --vanilla code_global.R
 
 git add .
 git commit -m "Update figures"

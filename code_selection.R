@@ -2,8 +2,9 @@ library(RColorBrewer)
 source("code_preprocess.R")
 
 ### Output directory
-figdir <- "PDF_figures_devel";
+figdir <- "PDF_figures";
 dir.create(figdir, recursive=TRUE, showWarnings=FALSE)
+dir.create("PNG_figures", recursive=TRUE, showWarnings=FALSE)
 
 ############################################################################################################################
 ### Custom regions
@@ -51,7 +52,7 @@ string_date <- format(as.Date(tail(colnames(confirmed_perc), 1)), format="%B %d,
 
 ### Averages across all countries
 confirmed_perc_mean <- colSums(confirmed) / sum(population) * 100
-deaths_perc_mean <- colSums(deaths) / sum(population) * 100
+deaths_perc_mean    <- colSums(deaths)    / sum(population) * 100
 recovered_perc_mean <- colSums(recovered) / sum(population) * 100
 
 confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
@@ -61,9 +62,11 @@ confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 min50 <- which(confirmed[,ncol(confirmed)] > 50)
 #idxs <- head(order(-confirmed_perc[,ncol(confirmed_perc)]), 9)
 #idxs <- head(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min50), 9)
-idxs <- which(rownames(covid19_confirmed_perc) %in% c("Netherlands", "Italy", "Washington State", "King County, WA"))
+idxs <- which(rownames(confirmed_perc) %in% c("Netherlands", "Italy", "Washington State", "King County, WA"))
 cols <- brewer.pal(9, "Set1")
 cols <- cols[1:length(idxs)]
+
+############################################################################################################################
 
 fn <- "percentage_population_confirmed_top9_min50"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
@@ -71,7 +74,7 @@ par(mar=c(2,4,1,5), bg="white", cex=2)
 # Confirmed cases
 plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(confirmed_perc[idxs,])), 
-     xlab="", ylab="", main=string_date) # xlim=as.Date(c("2020/02/27", "2020/03/09")), log="y"
+     xlab="", ylab="", main=string_date, xlim=as.Date(c("2020/02/27", "2020/03/09")))
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
 }
