@@ -10,7 +10,7 @@ cd ..
 # or!
 git pull origin master
 
-#R CMD batch --vanilla code_generate_figures.R
+R CMD batch --vanilla code_generate_figures.R
 
 git add .
 git commit -m "Code development"
