@@ -5,11 +5,16 @@ git merge upstream/master
 git push
 cd ..
 
+# make sure we're in sync with master
+#git rebase master
+# or!
+git pull origin master
+
 R CMD batch --vanilla code_global.R
 
 git add .
-git commit -m "Update figures"
+git commit -m "Code development"
 
-git push origin master
+git push origin devel
 
 
