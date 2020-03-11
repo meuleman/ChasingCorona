@@ -59,7 +59,7 @@ confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
 confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 
 # Selection of countries
-idxs <- which(rownames(confirmed_perc) %in% c("Netherlands", "Italy", "Washington State", "King County, WA"))
+idxs <- which(rownames(confirmed_perc) %in% c("Italy", "King County, WA", "Washington State", "Netherlands"))
 cols <- brewer.pal(9, "Set1")
 cols <- cols[1:length(idxs)]
 
