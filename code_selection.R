@@ -71,7 +71,7 @@ par(mar=c(2,4,1,5), bg="white", cex=2)
 # Confirmed cases
 plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(confirmed_perc[idxs,])), 
-     xlab="", ylab="", main=string_date, xlim=as.Date(c("2020/02/27", "2020/03/09")))
+     xlab="", ylab="", main=string_date, xlim=as.Date(c("2020-02-27", tail(colnames(confirmed_perc),1))))
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
 }
@@ -85,79 +85,4 @@ dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
-
-
-# Plot percentage weekly increase in confirmed cases, for each of (a new set of) top 9 countries
-fn <- "percentage_weekly_change_cases_confirmed_top20"
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-par(mar=c(2,3,1,4), bg="white", cex=2)
-# Confirmed cases, percent change per week
-confirmed_all_min100 <- confirmed_all[, -c(1:4)]
-confirmed_all_min100[confirmed_all_min100 < 100] <- NA # a minimum of 10 cases per region/country
-n <- ncol(confirmed_all_min100);
-confirmed_all_perc_diff <- (t(apply(confirmed_all_min100, 1, diff, lag=7)) / confirmed_all_min100[,-c((n-6):n)]) * 100
-colnames(confirmed_all_perc_diff) <- colnames(confirmed_all_min100[,-c(1:7)])
-rownames(confirmed_all_perc_diff) <- gsub("^ - ", "", paste(confirmed_all$Province.State, confirmed_all$Country.Region, sep=" - "))
-#idxs <- head(order(apply(confirmed_all_perc_diff, 1, median, na.rm=T), decreasing=TRUE), 9) # median weekly increase
-idxs <- head(order(confirmed_all_perc_diff[,ncol(confirmed_all_perc_diff)], decreasing=TRUE), 9) # current weekly increase
-cols <- brewer.pal(9, "Set1")
-xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
-plot(as.Date(colnames(confirmed_all_perc_diff)), rep(1, ncol(confirmed_all_perc_diff)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", main=string_date,
-     xlim=xlim, ylim=range(confirmed_all_perc_diff[idxs,], na.rm=T))
-for (i in 1:length(idxs)) {
-  lines(as.Date(colnames(confirmed_all_perc_diff)), confirmed_all_perc_diff[idxs[i],], col=cols[i], lwd=5)
-}
-axis(1, labels=F, at=as.Date(colnames(confirmed_all_perc_diff)), tcl=-0.25)
-axis(4, las=2)
-mtext("weekly % increase in confirmed cases", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-legend("topleft", "(x,y)", rownames(confirmed_all_perc_diff)[idxs], lwd=5, 
-       col=cols, inset=c(0.01, 0.1), bty="n")
-box()
-dev.off()
-if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
-}
-
-
-# Plot percentage daily increase in confirmed cases, for each of (a new set of) top 9 countries
-fn <- "percentage_daily_change_cases_confirmed_top20"
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-par(mar=c(2,3,1,4), bg="white", cex=2)
-# Confirmed cases, percent change per day
-confirmed_all_min100 <- confirmed_all[, -c(1:4)]
-confirmed_all_min100[confirmed_all_min100 < 100] <- NA # a minimum of 10 cases per region/country
-n <- ncol(confirmed_all_min100);
-confirmed_all_perc_diff <- (t(apply(confirmed_all_min100, 1, diff, lag=1)) / confirmed_all_min100[,-n]) * 100
-colnames(confirmed_all_perc_diff) <- colnames(confirmed_all_min100[,-c(1:1)])
-rownames(confirmed_all_perc_diff) <- gsub("^ - ", "", paste(confirmed_all$Province.State, confirmed_all$Country.Region, sep=" - "))
-#idxs <- head(order(apply(confirmed_all_perc_diff, 1, median, na.rm=T), decreasing=TRUE), 9) # median daily increase
-idxs <- head(order(confirmed_all_perc_diff[,ncol(confirmed_all_perc_diff)], decreasing=TRUE), 9) # current daily increase
-cols <- brewer.pal(9, "Set1")
-xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
-plot(as.Date(colnames(confirmed_all_perc_diff)), rep(1, ncol(confirmed_all_perc_diff)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", main=string_date,
-     xlim=xlim, ylim=range(confirmed_all_perc_diff[idxs,], na.rm=T))
-for (i in 1:length(idxs)) {
-  lines(as.Date(colnames(confirmed_all_perc_diff)), confirmed_all_perc_diff[idxs[i],], col=cols[i], lwd=5)
-}
-axis(1, labels=F, at=as.Date(colnames(confirmed_all_perc_diff)), tcl=-0.25)
-axis(4, las=2)
-mtext("daily % increase in confirmed cases", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-legend("topleft", "(x,y)", rownames(confirmed_all_perc_diff)[idxs], lwd=5, 
-       col=cols, inset=c(0.01, 0.1), bty="n")
-box()
-dev.off()
-if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
-}
-
-# Other ideas:
-# - plot exponent change (e.g. e-1) to predict going from exponential to sigmoidal
-# - plot percentage of cases recovered: tipping point at 50%
-# - plot weekly change in %
-# - plot comparisons between countries: for similar shape/exponent, obtain shift in time
-
 

@@ -59,7 +59,7 @@ dat_to_plot[dat_to_plot==0] <- NA
 #xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
 xlim=range(as.Date(colnames(confirmed)))
 plot(as.Date(colnames(confirmed)), rep(1, ncol(confirmed)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log="y", xlim=xlim,
+     type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", xlim=xlim,
      ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(confirmed)), confirmed[idxs[i],], col=cols[i], lwd=5)
@@ -72,7 +72,7 @@ par(mar=c(0,0,0,0))
 plot(0, type="n", axes=FALSE)
 legend("topleft", "(x,y)", string_date, inset=c(-0.12,-0.02), bty="n", cex=1.25, text.font=4)
 labs <- rownames(confirmed)[idxs]
-nums <- signif(confirmed[idxs,ncol(confirmed)], 2)
+nums <- confirmed[idxs,ncol(confirmed)]
 ord <- order(nums, decreasing=TRUE)
 legend("topleft", "(x,y)", labs[ord], lwd=5, cex=0.7, col=cols[ord], inset=c(0.01, 0.1), bty="n")
 legend("topright", "(x,y)", nums[ord], cex=0.7, inset=c(0.01, 0.1), bty="n")
@@ -81,7 +81,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "absolute_numbers_top20_min100"
+fn <- "absolute_numbers_top20_min100_log"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 layout(matrix(1:2, ncol=2), width=c(7,3))
 par(oma=c(2,2,1,0), bg="white", cex=2)
@@ -105,7 +105,7 @@ par(mar=c(0,0,0,0))
 plot(0, type="n", axes=FALSE)
 legend("topleft", "(x,y)", string_date, inset=c(-0.12,-0.02), bty="n", cex=1.25, text.font=4)
 labs <- rownames(confirmed)[idxs]
-nums <- signif(confirmed[idxs,ncol(confirmed)], 2)
+nums <- confirmed[idxs,ncol(confirmed)]
 ord <- order(nums, decreasing=TRUE)
 legend("topleft", "(x,y)", labs[ord], lwd=5, cex=0.7, col=cols[ord], inset=c(0.01, 0.1), bty="n")
 legend("topright", "(x,y)", nums[ord], cex=0.7, inset=c(0.01, 0.1), bty="n")
@@ -156,7 +156,7 @@ par(mar=c(0,0,0,4))
 # Confirmed cases
 dat_to_plot <- confirmed_perc[idxs,]
 dat_to_plot[dat_to_plot==0] <- NA
-xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
+#xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
 xlim=as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
 plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log="y", xlim=xlim,
@@ -168,7 +168,8 @@ for (i in 1:length(idxs)) {
 axis(1, labels=F, at=as.Date(colnames(recovered_perc)), tcl=-0.25)
 axis(4, las=2)
 mtext("% of population", side=2, line=0.5, cex=2)
-legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+#legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+legend("bottomright", "(x,y)", "Confirmed cases", inset=c(0,-0.02), bty="n", cex=1.25, text.font=4)
 par(mar=c(0,0,0,0))
 plot(0, type="n", axes=FALSE)
 labs <- c(rownames(confirmed_perc)[idxs], "World-wide")
