@@ -59,7 +59,7 @@ confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
 confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 
 # Obtain "top-scoring" countries, in terms of percentage of population affected (min. 50 cases)
-min50 <- which(confirmed[,ncol(confirmed)] > 50)
+#min50 <- which(confirmed[,ncol(confirmed)] > 50)
 #idxs <- head(order(-confirmed_perc[,ncol(confirmed_perc)]), 9)
 #idxs <- head(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min50), 9)
 idxs <- which(rownames(confirmed_perc) %in% c("Netherlands", "Italy", "Washington State", "King County, WA"))

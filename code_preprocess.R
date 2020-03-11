@@ -113,7 +113,7 @@ rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <-
   names(population) <- confirmed_pop[,1]
 
 ### Construct date string for showing in figures.
-string_date <- format(as.Date(tail(colnames(confirmed_perc), 1)), format="%B %d, %Y")
+string_date <- format(as.Date(tail(colnames(confirmed), 1)), format="%B %d, %Y")
 
 ############################################################################################################################
 
