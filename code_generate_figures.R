@@ -28,8 +28,9 @@ confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 
 # Obtain "top-scoring" countries, in terms of percentage of population affected (min. 50 cases)
 min50 <- which(confirmed[,ncol(confirmed)] > 50)
+min100k <- which(population > 100000)
 #idxs <- head(order(-confirmed_perc[,ncol(confirmed_perc)]), 9)
-idxs <- head(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min50), 9)
+idxs <- head(intersect(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min50), min100k), 9)
 cols <- brewer.pal(9, "Set1")
 
 fn <- "percentage_population_confirmed_top9_min50"
