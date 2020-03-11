@@ -6,6 +6,7 @@ git push
 cd ..
 
 R CMD batch --vanilla code_global.R
+R CMD batch --vanilla code_selection.R
 
 git add .
 git add --force PDF_figures
