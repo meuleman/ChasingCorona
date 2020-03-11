@@ -42,6 +42,7 @@ population[population$country_pop=="China","country_pop"] <- "Mainland China";
 population[population$country_pop=="United States","country_pop"] <- "US";
 population[population$country_pop=="United Kingdom","country_pop"] <- "UK";
 population[population$country_pop=="Slovak Republic","country_pop"] <- "Slovakia";
+population[population$country_pop=="Brunei Darussalam","country_pop"] <- "Brunei";
 
 ############################################################################################################################
 ### Load in COVID-19 case data
@@ -56,6 +57,10 @@ colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <-
 confirmed_all[confirmed_all$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
 deaths_all[deaths_all$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
 recovered_all[recovered_all$Country.Region=="Taiwan","Country.Region"] <- "Mainland China";
+# Same for Hong Kong
+confirmed_all[confirmed_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
+deaths_all[deaths_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
+recovered_all[recovered_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
 # Same for Saint Barthelemy
 confirmed_all[confirmed_all$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
 deaths_all[deaths_all$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
@@ -68,6 +73,9 @@ recovered_all[recovered_all$Country.Region=="Palestine","Country.Region"] <- "Is
 confirmed_all[confirmed_all$Country.Region=="Vatican City","Country.Region"] <- "Italy";
 deaths_all[deaths_all$Country.Region=="Vatican City","Country.Region"] <- "Italy";
 recovered_all[recovered_all$Country.Region=="Vatican City","Country.Region"] <- "Italy";
+confirmed_all[confirmed_all$Country.Region=="Holy See","Country.Region"] <- "Italy";
+deaths_all[deaths_all$Country.Region=="Holy See","Country.Region"] <- "Italy";
+recovered_all[recovered_all$Country.Region=="Holy See","Country.Region"] <- "Italy";
 # Same for Martinique
 confirmed_all[confirmed_all$Country.Region=="Martinique","Country.Region"] <- "France";
 deaths_all[deaths_all$Country.Region=="Martinique","Country.Region"] <- "France";
@@ -80,6 +88,10 @@ recovered_all[recovered_all$Country.Region=="French Guiana","Country.Region"] <-
 confirmed_all[confirmed_all$Country.Region=="Republic of Ireland","Country.Region"] <- "Ireland";
 deaths_all[deaths_all$Country.Region=="Republic of Ireland","Country.Region"] <- "Ireland";
 recovered_all[recovered_all$Country.Region=="Republic of Ireland","Country.Region"] <- "Ireland";
+# Double-registered Iran?
+confirmed_all[confirmed_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
+deaths_all[deaths_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
+recovered_all[recovered_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 confirmed_simple <- aggregate(confirmed_all[,-c(1:4)], by=list(country=confirmed_all$Country.Region), FUN=sum)
