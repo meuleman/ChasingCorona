@@ -19,8 +19,8 @@ recovered_perc <- sweep(recovered, 1, population, FUN="/") * 100
 ### Percentage of confirmed cases that have resulted in deaths / recoveries
 confirmed_deaths_perc <- deaths / confirmed * 100
 confirmed_recovered_perc <- recovered / confirmed * 100
-confirmed_deaths_perc[confirmed < 50] <- NA # minimum of 50 cases required
-confirmed_recovered_perc[confirmed < 50] <- NA # minimum of 50 cases required
+confirmed_deaths_perc[confirmed < 100] <- NA # minimum of 100 cases required
+confirmed_recovered_perc[confirmed < 100] <- NA # minimum of 100 cases required
 
 ### Averages across all countries
 confirmed_perc_mean <- colSums(confirmed) / sum(population) * 100
@@ -30,22 +30,30 @@ recovered_perc_mean <- colSums(recovered) / sum(population) * 100
 confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
 confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 
-# Obtain "top-scoring" countries, in terms of percentage of population affected (min. 50 cases)
-min50 <- which(confirmed[,ncol(confirmed)] > 50)
-min100k <- which(population > 100000)
+# Obtain "top-scoring" countries, in terms of percentage of population affected (min. 100 cases)
+min_cases_100 <- which(apply(confirmed, 1, max, na.rm=T) > 100) # to accommodate NAs
+#min_pop_100 <- which(population > 100000)
+min_pop_1000 <- which(population > 1000000)
 #idxs <- head(order(-confirmed_perc[,ncol(confirmed_perc)]), 9)
-idxs <- head(intersect(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min50), min100k), 9)
+idxs <- head(intersect(intersect(order(-apply(confirmed_perc, 1, max, na.rm=T)), min_cases_100), min_pop_1000), 9)
 cols <- brewer.pal(9, "Set1")
+#idxs <- head(intersect(intersect(order(-confirmed_perc[,ncol(confirmed_perc)]), min100), min_pop_100), 20)
+#cols <- c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', 
+#          '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', 
+#          '#808000', '#ffd8b1', '#000075', '#808080', '#000000')
+#source: https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
 
 ############################################################################################################################
 
-fn <- "percentage_population_confirmed_top9_min50"
+fn <- "percentage_population_confirmed_top9_min1000_log"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 par(mar=c(2,4,1,5), bg="white", cex=2)
 # Confirmed cases
+dat_to_plot <- confirmed_perc[idxs,]
+dat_to_plot[dat_to_plot==0] <- NA
 plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(confirmed_perc[idxs,])), 
-     xlab="", ylab="", main=string_date)
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=range(dat_to_plot, na.rm=T),
+     xlab="", ylab="", main=string_date, log="y")
 lines(as.Date(colnames(confirmed_perc)), confirmed_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
   lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
@@ -54,20 +62,20 @@ axis(1, labels=F, at=as.Date(colnames(recovered_perc)), tcl=-0.25)
 axis(4, las=2)
 mtext("% of population", side=2, line=0.5, cex=2)
 legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-legend("topleft", "(x,y)", c(rownames(confirmed_perc)[idxs], "World-wide"), lwd=5, 
-       col=c(cols, "black"), inset=c(0.01, 0.1), bty="n")
+legend("topleft", "(x,y)", c(rownames(confirmed_perc)[idxs], "World-wide"), lwd=5, cex=0.75,
+       col=c(cols, "black"), inset=c(0.01, 0.1), bty="n", ncol=2)
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_population_deaths_recovered_top9_min50"
+fn <- "percentage_population_deaths_recovered_top9_min1000"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
 par(mar=c(2,2,1,4), mfrow=c(1,2), cex=3, bg="white")
 # Deaths
 plot(as.Date(colnames(deaths_perc)), rep(0, ncol(deaths_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(deaths_perc[idxs,])), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(deaths_perc[idxs,], na.rm=T)), 
      xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(deaths_perc)), deaths_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
@@ -80,7 +88,7 @@ legend("topleft", "(x,y)", "Deaths", inset=c(-0.05,0.005), bty="n", cex=1.25, te
 box()
 # Recovered
 plot(as.Date(colnames(recovered_perc)), rep(0, ncol(recovered_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(recovered_perc[idxs,])), 
+     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(recovered_perc[idxs,], na.rm=T)), 
      xlab="", ylab="", main=string_date)
 lines(as.Date(colnames(recovered_perc)), recovered_perc_mean, col="black", lwd=5)
 for (i in 1:length(idxs)) {
@@ -96,7 +104,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_cases_deaths_recovered_top9_min50"
+fn <- "percentage_cases_deaths_recovered_top9_min1000"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
 par(mar=c(2,2,1,4), mfrow=c(1,2), cex=3, bg="white")
 # Plot percentage of cases resulting in deaths
@@ -133,7 +141,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 }
 
 # Plot absolute number of confirmed cases for each of the top 9 countries
-fn <- "absolute_numbers_top9_min50"
+fn <- "absolute_numbers_top9_min1000"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 par(mar=c(2,3,1,4), bg="white", cex=2)
 # Confirmed cases
@@ -147,8 +155,8 @@ axis(1, labels=F, at=as.Date(colnames(confirmed)), tcl=-0.25)
 axis(4, las=2)
 mtext("# of confirmed cases", side=2, line=0.5, cex=2)
 legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-#legend("topleft", "(x,y)", rownames(confirmed)[idxs], lwd=5, 
-#       col=cols, inset=c(0.01, 0.1), bty="n")
+legend("topleft", "(x,y)", rownames(confirmed_perc)[idxs], lwd=5, cex=0.75,
+       col=cols, inset=c(0.01, 0.1), bty="n", ncol=2)
 box()
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
