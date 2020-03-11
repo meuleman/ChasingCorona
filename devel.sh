@@ -5,10 +5,10 @@ git merge upstream/master
 git push
 cd ..
 
-# make sure we're in sync with master
-#git rebase master
-# or!
-git pull origin master
+## make sure we're in sync with master
+##git rebase master
+## or!
+#git pull origin master
 
 R CMD batch --vanilla code_global.R
 
