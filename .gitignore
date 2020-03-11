@@ -2,5 +2,8 @@
 *.Rout
 submodule_use.txt
 .gitignore
+<<<<<<< HEAD
 PDF_figures/*
 PNG_figures/*
+=======
+>>>>>>> 3b9b1f6e67d342e39934147c4376a21d67e3dc06
