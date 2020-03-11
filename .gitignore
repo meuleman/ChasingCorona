@@ -1,6 +1,0 @@
-.gitignore
-.DS_Store
-*.Rout
-submodule_use.txt
-PDF_figures/*
-PNG_figures/*
