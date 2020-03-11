@@ -1,9 +1,6 @@
 .DS_Store
 *.Rout
 submodule_use.txt
-<<<<<<< HEAD
-=======
+.gitignore
 PDF_figures/*
 PNG_figures/*
-
->>>>>>> devel
