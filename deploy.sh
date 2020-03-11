@@ -8,6 +8,8 @@ cd ..
 R CMD batch --vanilla code_global.R
 
 git add .
+git add --force PDF_figures
+git add --force PNG_figures
 git commit -m "Update figures"
 
 git push origin master
