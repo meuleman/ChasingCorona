@@ -44,6 +44,14 @@ population[population$country_pop=="United States","country_pop"] <- "US";
 #population[population$country_pop=="United Kingdom","country_pop"] <- "UK";
 population[population$country_pop=="Slovak Republic","country_pop"] <- "Slovakia";
 population[population$country_pop=="Brunei Darussalam","country_pop"] <- "Brunei";
+population[population$country_pop=="Czech Republic","country_pop"] <- "Czechia";
+
+# Merge some labels
+population[population$country_pop=="Congo, Rep.","country_pop"] <- "Congo";
+population[population$country_pop=="Congo, Dem. Rep.","country_pop"] <- "Congo";
+
+population <- aggregate(population$population, by=list(country_pop=population$country_pop), FUN=sum)
+colnames(population) <- c("country_pop", "population")
 
 ############################################################################################################################
 ### Load in COVID-19 case data
@@ -55,13 +63,17 @@ colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <-
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
 # Need to pool Taipei/Taiwan with Mainland China, as the Worldbank apparently does not recognize it.
-confirmed_all[confirmed_all$Country.Region=="Taipei and environs","Country.Region"] <- "Mainland China";
-deaths_all[deaths_all$Country.Region=="Taipei and environs","Country.Region"] <- "Mainland China";
-recovered_all[recovered_all$Country.Region=="Taipei and environs","Country.Region"] <- "Mainland China";
+confirmed_all[confirmed_all$Country.Region=="Taipei and environs","Country.Region"] <- "China";
+deaths_all[deaths_all$Country.Region=="Taipei and environs","Country.Region"] <- "China";
+recovered_all[recovered_all$Country.Region=="Taipei and environs","Country.Region"] <- "China";
 # Same for Macao
-confirmed_all[confirmed_all$Country.Region=="Macao SAR","Country.Region"] <- "Mainland China";
-deaths_all[deaths_all$Country.Region=="Macao SAR","Country.Region"] <- "Mainland China";
-recovered_all[recovered_all$Country.Region=="Macao SAR","Country.Region"] <- "Mainland China";
+confirmed_all[confirmed_all$Country.Region=="Macao SAR","Country.Region"] <- "China";
+deaths_all[deaths_all$Country.Region=="Macao SAR","Country.Region"] <- "China";
+recovered_all[recovered_all$Country.Region=="Macao SAR","Country.Region"] <- "China";
+# Same for Taiwan
+confirmed_all[confirmed_all$Country.Region=="Taiwan*","Country.Region"] <- "China";
+deaths_all[deaths_all$Country.Region=="Taiwan*","Country.Region"] <- "China";
+recovered_all[recovered_all$Country.Region=="Taiwan*","Country.Region"] <- "China";
 # Same for Palestine
 confirmed_all[confirmed_all$Country.Region=="occupied Palestinian territory","Country.Region"] <- "Israel"; 
 deaths_all[deaths_all$Country.Region=="occupied Palestinian territory","Country.Region"] <- "Israel";
@@ -86,6 +98,10 @@ recovered_all[recovered_all$Country.Region=="Martinique","Country.Region"] <- "F
 confirmed_all[confirmed_all$Country.Region=="French Guiana","Country.Region"] <- "France";
 deaths_all[deaths_all$Country.Region=="French Guiana","Country.Region"] <- "France";
 recovered_all[recovered_all$Country.Region=="French Guiana","Country.Region"] <- "France";
+# Same for Reunion
+confirmed_all[confirmed_all$Country.Region=="Reunion","Country.Region"] <- "France";
+deaths_all[deaths_all$Country.Region=="Reunion","Country.Region"] <- "France";
+recovered_all[recovered_all$Country.Region=="Reunion","Country.Region"] <- "France";
 # Rename Iran
 confirmed_all[confirmed_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
 deaths_all[deaths_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
@@ -98,6 +114,10 @@ recovered_all[recovered_all$Country.Region=="Viet Nam","Country.Region"] <- "Vie
 confirmed_all[confirmed_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
 deaths_all[deaths_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
 recovered_all[recovered_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
+# Rename Congo (Kinshasa)
+confirmed_all[confirmed_all$Country.Region=="Congo (Kinshasa)","Country.Region"] <- "Congo";
+deaths_all[deaths_all$Country.Region=="Congo (Kinshasa)","Country.Region"] <- "Congo";
+recovered_all[recovered_all$Country.Region=="Congo (Kinshasa)","Country.Region"] <- "Congo";
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 confirmed_simple <- aggregate(confirmed_all[,-c(1:4)], by=list(country=confirmed_all$Country.Region), FUN=sum)
