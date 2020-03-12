@@ -36,11 +36,12 @@ population[population$country_pop=="Egypt, Arab Rep.","country_pop"] <- "Egypt";
 population[population$country_pop=="Macao SAR, China","country_pop"] <- "Macau";
 population[population$country_pop=="Hong Kong SAR, China","country_pop"] <- "Hong Kong";
 population[population$country_pop=="Iran, Islamic Rep.","country_pop"] <- "Iran";
-population[population$country_pop=="Korea, Rep.","country_pop"] <- "Republic of Korea";
-population[population$country_pop=="Moldova","country_pop"] <- "Republic of Moldova";
-population[population$country_pop=="China","country_pop"] <- "Mainland China";
+population[population$country_pop=="Korea, Rep.","country_pop"] <- "Korea, South";
+population[population$country_pop=="Russian Federation","country_pop"] <- "Russia";
+#population[population$country_pop=="Moldova","country_pop"] <- "Republic of Moldova";
+#population[population$country_pop=="China","country_pop"] <- "Mainland China";
 population[population$country_pop=="United States","country_pop"] <- "US";
-population[population$country_pop=="United Kingdom","country_pop"] <- "UK";
+#population[population$country_pop=="United Kingdom","country_pop"] <- "UK";
 population[population$country_pop=="Slovak Republic","country_pop"] <- "Slovakia";
 population[population$country_pop=="Brunei Darussalam","country_pop"] <- "Brunei";
 
