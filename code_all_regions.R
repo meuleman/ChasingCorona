@@ -98,7 +98,7 @@ ord <- order(apply(coeff_mat_noNA, 1, which.max), -apply(coeff_mat_noNA, 1, max)
 fn <- "percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=13, height=8)
 layout(matrix(1:2, ncol=2), widths=c(10,2))
-par(mar=c(3,2,2,8), bg="white", xpd=T)
+par(mar=c(3,2,2,8), xpd=T, bg="white")
 image(x=1:ncol(coeff_mat_noNA), y=1:nrow(coeff_mat_noNA), z=t(coeff_mat_noNA[ord,]), axes=FALSE, xlab="", ylab="",
       breaks=c(-1, seq(0,max(coeff_mat_noNA), length.out=99), 100), col=colorpanel(100, "darkgrey", "red"))
 wmax <- apply(coeff_mat_noNA, 1, which.max)
@@ -106,7 +106,7 @@ points(wmax[ord], 1:nrow(coeff_mat_noNA), pch=16, cex=0.2)
 axis(4, at=1:nrow(coeff_mat_noNA), label=rownames(coeff_mat_noNA)[ord], las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
 text(x=1:ncol(coeff_mat_noNA), y=0, label=as.Date(colnames(coeff_mat_noNA)), srt=35, adj=c(1,1), cex=0.6)
 legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75, inset=c(-0.17,-0.06))
-par(mar=c(3,4,2,1), bg="white", xpd=T)
+par(mar=c(3,4,2,1), xpd=T, bg="white")
 image(x=1:2, y=1:nrow(coeff_mat_noNA), z=t(cbind(apply(coeff_mat_noNA, 1, max), coeff_mat_noNA[,ncol(coeff_mat_noNA)])[ord,]), 
       axes=FALSE, xlab="", ylab="",
       breaks=c(-1, seq(0,max(coeff_mat_noNA), length.out=99), 100), col=colorpanel(100, "darkgrey", "red"))
@@ -125,7 +125,8 @@ text(x=1:2, y=0, label=c("Highest (·)", paste("Current\n(", string_date, ")", s
 mtext("Percent daily growth of number of confirmed cases", side=3, outer=TRUE, line=-1.6)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
+  #system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 -background white -alpha remove ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
 
