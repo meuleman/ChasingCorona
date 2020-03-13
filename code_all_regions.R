@@ -125,7 +125,7 @@ text(x=1:2, y=0, label=c("Highest (·)", paste("Current\n(", string_date, ")", s
 mtext("Percent daily growth of number of confirmed cases", side=3, outer=TRUE, line=-1.6)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
 
