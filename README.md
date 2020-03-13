@@ -22,7 +22,12 @@ Because the growth of COVID-19 happens exponentially, it often makes more sense 
 The slope of the exponential curves tells us something about how fast the virus spreads.
 Here we have expressed these rates in terms of daily percent new cases, based on the number of confirmed cases over the course of the 10 previous days:
 
-![perc. daily confirmed new cases](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_top20_latest.png "% daily confirmed new cases")
+![perc. daily confirmed new cases, top20](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_top20_latest.png "% daily confirmed new cases")
+
+Of course this can be extended to all countries and regions with enough data points:
+
+![perc. daily confirmed new cases, all](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning_latest.png "% daily confirmed new cases, all")
+
 
 ### Additional figures
 
