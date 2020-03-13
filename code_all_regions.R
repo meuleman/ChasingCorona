@@ -51,6 +51,40 @@ colnames(confirmed) <- colnames(deaths) <- colnames(recovered) <-
 rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
   gsub("^ - ", "", paste(metadata$Province.State, metadata$Country.Region, sep=" - "))
 
+to_change <- which(rownames(confirmed) == "UK - United Kingdom")
+if (!is.null(to_change)) {
+  rownames(confirmed)[to_change] <- "United Kingdom"
+  rownames(deaths)[to_change] <- "United Kingdom"
+  rownames(recovered)[to_change] <- "United Kingdom"
+}
+to_change <- which(rownames(confirmed) == "France - France")
+if (!is.null(to_change)) {
+  rownames(confirmed)[to_change] <- "France"
+  rownames(deaths)[to_change] <- "France"
+  rownames(recovered)[to_change] <- "France"
+}
+to_rm <- which(rownames(confirmed) == "Diamond Princess - US")
+if (!is.null(to_rm)) {
+  confirmed <- confirmed[-to_rm,]
+  deaths <- deaths[-to_rm,]
+  recovered <- recovered[-to_rm,]
+  metadata <- metadata[-to_rm,]
+}
+
+# Aggregate by country, and add as separate data points
+confirmed_agg <- aggregate(confirmed, by=list(country=metadata$Country.Region), FUN=sum)
+deaths_agg <- aggregate(deaths, by=list(country=metadata$Country.Region), FUN=sum)
+recovered_agg <- aggregate(recovered, by=list(country=metadata$Country.Region), FUN=sum)
+
+rownames(confirmed_agg) <- confirmed_agg[,1]; confirmed_agg <- confirmed_agg[,-1];
+rownames(deaths_agg) <- deaths_agg[,1]; deaths_agg <- deaths_agg[,-1];
+rownames(recovered_agg) <- recovered_agg[,1]; recovered_agg <- recovered_agg[,-1];
+
+to_rm <- which(rownames(confirmed_agg) %in% rownames(confirmed))
+confirmed <- rbind(confirmed, confirmed_agg[-to_rm,])
+deaths <- rbind(deaths, deaths_agg[-to_rm,])
+recovered <- rbind(recovered, recovered_agg[-to_rm,])
+
 idxs <- which(rowSums(confirmed > 10) >= 10) # Select only regions that have at least 10 days with more than 10 cases
 
 ############################################################################################################################
