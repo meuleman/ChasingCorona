@@ -56,8 +56,8 @@ par(mar=c(0,0,0,4))
 # Confirmed cases
 dat_to_plot <- confirmed[idxs,]
 dat_to_plot[dat_to_plot==0] <- NA
-#xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
-xlim=range(as.Date(colnames(confirmed)))
+#xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
+xlim <- range(as.Date(colnames(confirmed)))
 plot(as.Date(colnames(confirmed)), rep(1, ncol(confirmed)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", xlim=xlim,
      ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
@@ -76,6 +76,8 @@ nums <- apply(confirmed[idxs,], 1, max, na.rm=T)
 ord <- order(nums, decreasing=TRUE)
 legend("topleft", "(x,y)", labs[ord], lwd=5, cex=0.7, col=cols[ord], inset=c(0.01, 0.1), bty="n")
 legend("topright", "(x,y)", nums[ord], cex=0.7, inset=c(0.01, 0.1), bty="n")
+par(new=T, xpd=T, oma=c(0,0,0,0))
+legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
@@ -89,8 +91,8 @@ par(mar=c(0,0,0,4))
 # Confirmed cases
 dat_to_plot <- confirmed[idxs,]
 dat_to_plot[dat_to_plot==0] <- NA
-#xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
-xlim=range(as.Date(colnames(confirmed)))
+#xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
+xlim <- range(as.Date(colnames(confirmed)))
 plot(as.Date(colnames(confirmed)), rep(1, ncol(confirmed)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log="y", xlim=xlim,
      ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
@@ -109,6 +111,8 @@ nums <- apply(confirmed[idxs,], 1, max, na.rm=T)
 ord <- order(nums, decreasing=TRUE)
 legend("topleft", "(x,y)", labs[ord], lwd=5, cex=0.7, col=cols[ord], inset=c(0.01, 0.1), bty="n")
 legend("topright", "(x,y)", nums[ord], cex=0.7, inset=c(0.01, 0.1), bty="n")
+par(new=T, xpd=T, oma=c(0,0,0,0))
+legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
@@ -123,8 +127,8 @@ par(mar=c(0,0,0,4))
 # Confirmed cases
 dat_to_plot <- confirmed_perc[idxs,]
 dat_to_plot[dat_to_plot==0] <- NA
-xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
-xlim=as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
+xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
+xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
 plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", xlim=xlim,
      ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
@@ -143,6 +147,8 @@ nums <- signif(c(apply(confirmed_perc[idxs,], 1, max, na.rm=T), tail(confirmed_p
 legend("topleft", "(x,y)", string_date, inset=c(-0.12,-0.02), bty="n", cex=1.25, text.font=4)
 legend("topleft", "(x,y)", labs, lwd=5, cex=0.7, col=c(cols, "black"), inset=c(0.01, 0.1), bty="n")
 legend("topright", "(x,y)", paste(nums, "%", sep=""), cex=0.7, inset=c(0.01, 0.1), bty="n")
+par(new=T, xpd=T, oma=c(0,0,0,0))
+legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
@@ -156,8 +162,9 @@ par(mar=c(0,0,0,4))
 # Confirmed cases
 dat_to_plot <- confirmed_perc[idxs,]
 dat_to_plot[dat_to_plot==0] <- NA
-#xlim=as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
-xlim=as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
+#xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
+xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
+xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
 plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
      type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log="y", xlim=xlim,
      ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
@@ -168,8 +175,8 @@ for (i in 1:length(idxs)) {
 axis(1, labels=F, at=as.Date(colnames(recovered_perc)), tcl=-0.25)
 axis(4, las=2)
 mtext("% of population", side=2, line=0.5, cex=2)
-#legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
-legend("bottomright", "(x,y)", "Confirmed cases", inset=c(0,-0.02), bty="n", cex=1.25, text.font=4)
+legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+#legend("bottomright", "(x,y)", "Confirmed cases", inset=c(0,-0.02), bty="n", cex=1.25, text.font=4)
 par(mar=c(0,0,0,0))
 plot(0, type="n", axes=FALSE)
 labs <- c(rownames(confirmed_perc)[idxs], "World-wide")
@@ -177,6 +184,8 @@ nums <- signif(c(apply(confirmed_perc[idxs,], 1, max, na.rm=T), tail(confirmed_p
 legend("topleft", "(x,y)", string_date, inset=c(-0.12,-0.02), bty="n", cex=1.25, text.font=4)
 legend("topleft", "(x,y)", labs, lwd=5, cex=0.7, col=c(cols, "black"), inset=c(0.01, 0.1), bty="n")
 legend("topright", "(x,y)", paste(nums, "%", sep=""), cex=0.7, inset=c(0.01, 0.1), bty="n")
+par(new=T, xpd=T, oma=c(0,0,0,0))
+legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
