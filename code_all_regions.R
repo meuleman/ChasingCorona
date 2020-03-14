@@ -51,7 +51,7 @@ colnames(confirmed) <- colnames(deaths) <- colnames(recovered) <-
 rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
   gsub("^ - ", "", paste(metadata$Province.State, metadata$Country.Region, sep=" - "))
 
-to_change <- which(rownames(confirmed) == "UK - United Kingdom")
+to_change <- which(rownames(confirmed) == "United Kingdom - United Kingdom")
 if (!is.null(to_change)) {
   rownames(confirmed)[to_change] <- "United Kingdom"
   rownames(deaths)[to_change] <- "United Kingdom"
