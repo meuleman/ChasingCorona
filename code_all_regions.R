@@ -46,6 +46,12 @@ confirmed <- confirmed_all[,-c(1:4)]
 deaths <- deaths_all[,-c(1:4)]
 recovered <- recovered_all[,-c(1:4)]
 
+if(all(is.na(confirmed[,ncol(confirmed)]))) {
+ confirmed <- confirmed[,-ncol(confirmed)]
+ deaths <- deaths[,-ncol(deaths)]
+ recovered <- recovered[,-ncol(recovered)]
+}
+
 colnames(confirmed) <- colnames(deaths) <- colnames(recovered) <- 
   as.character(as.Date(colnames(confirmed), format="X%m.%d.%y"))
 rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
@@ -134,7 +140,7 @@ plotfile(paste(figdir, fn, sep="/"), type="pdf", width=13, height=8)
 layout(matrix(1:2, ncol=2), widths=c(10,2))
 par(mar=c(3,2,2,8), xpd=T, bg="white")
 image(x=1:ncol(coeff_mat_noNA), y=1:nrow(coeff_mat_noNA), z=t(coeff_mat_noNA[ord,]), axes=FALSE, xlab="", ylab="",
-      breaks=c(-1, seq(0,max(coeff_mat_noNA), length.out=99), 100), col=colorpanel(100, "darkgrey", "red"))
+      breaks=c(-1, seq(0,max(coeff_mat_noNA), length.out=99), 100), col=colorpanel(100, "darkgrey", "#e2ae79"))
 wmax <- apply(coeff_mat_noNA, 1, which.max)
 points(wmax[ord], 1:nrow(coeff_mat_noNA), pch=16, cex=0.2)
 axis(4, at=1:nrow(coeff_mat_noNA), label=rownames(coeff_mat_noNA)[ord], las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
@@ -145,7 +151,7 @@ legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", b
 par(mar=c(3,4,2,1), xpd=T, bg="white")
 image(x=1:2, y=1:nrow(coeff_mat_noNA), z=t(cbind(apply(coeff_mat_noNA, 1, max), coeff_mat_noNA[,ncol(coeff_mat_noNA)])[ord,]), 
       axes=FALSE, xlab="", ylab="",
-      breaks=c(-1, seq(0,max(coeff_mat_noNA), length.out=99), 100), col=colorpanel(100, "darkgrey", "red"))
+      breaks=c(-1, seq(0,max(coeff_mat_noNA), length.out=99), 100), col=colorpanel(100, "darkgrey", "#e2ae79"))
 wmax <- apply(coeff_mat, 1, which.max)
 max_dates <- format(as.Date(colnames(coeff_mat)[wmax][ord]), format="%B %d, %Y")
 axis(2, at=1:nrow(coeff_mat_noNA), label=max_dates, las=2, tick=FALSE, cex.axis=0.6, line=-0.8)

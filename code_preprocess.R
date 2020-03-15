@@ -150,6 +150,12 @@ recovered <- recovered_pop[,-c(1:3)]
 rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
   names(population) <- confirmed_pop[,1]
 
+if(all(is.na(confirmed[,ncol(confirmed)]))) {
+ confirmed <- confirmed[,-ncol(confirmed)]
+ deaths <- deaths[,-ncol(deaths)]
+ recovered <- recovered[,-ncol(recovered)]
+}
+
 ### Construct date string for showing in figures.
 #string_date <- format(as.Date(tail(colnames(confirmed), 1)), format="%B %d, %Y")
 

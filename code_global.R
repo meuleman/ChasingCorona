@@ -50,9 +50,10 @@ plot_absolute_numbers <- function(confirmed, idxs, cols, xlim=NULL, logscale=FAL
   if (is.null(xlim)) xlim <- range(as.Date(colnames(confirmed)))
   dat_to_plot <- confirmed[idxs,]
   dat_to_plot[dat_to_plot==0] <- NA
-  plot(as.Date(colnames(confirmed)), rep(1, ncol(confirmed)), 
+  plot(as.Date(colnames(confirmed)), rep(1, ncol(confirmed)),
        type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log=ifelse(logscale, "y", ""), 
        xlim=xlim, ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
+       #xlim=xlim, ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
   for (i in 1:length(idxs)) {
     lines(as.Date(colnames(confirmed)), confirmed[idxs[i],], col=cols[i], lwd=5)
   }
