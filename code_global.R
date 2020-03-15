@@ -238,9 +238,58 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 }
 
 ############################################################################################################################
+# Normalized numbers of current cases per country
+############################################################################################################################
+
+### Percentage of population with current cases
+current <- confirmed - recovered - deaths
+current_perc <- sweep(current, 1, population, FUN="/") * 100
+idxs <- intersect(intersect(which(rowSums(current > 10) >= 10), min_cases_100), min_pop_100)
+#idxs <- which(rowSums(current > 10) >= 10) # Select only regions/countries that have 10+ days with more than 10 current cases
+current_mat <- as.matrix(current_perc[idxs,])
+ord <- order(apply(current_mat, 1, which.max), -apply(current_mat, 1, max), decreasing=TRUE)
+
+fn <- "percentage_population_current_cases_ALL_fromBeginning"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=13, height=8)
+layout(matrix(1:2, ncol=2), widths=c(10,2))
+par(mar=c(3,2,2,8), xpd=T, bg="white")
+image(x=1:ncol(current_mat), y=1:nrow(current_mat), z=t(current_mat[ord,]), axes=FALSE, xlab="", ylab="",
+      breaks=c(-1, seq(0, quantile(current_mat, prob=0.95), length.out=99), 100), 
+      col=c("grey97", colorpanel(99, "grey90", "#e2ae79")))
+wmax <- apply(current_mat, 1, which.max)
+points(wmax[ord], 1:nrow(current_mat), pch=16, cex=0.2)
+axis(4, at=1:nrow(current_mat), label=rownames(current_mat)[ord], las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
+text(x=1:ncol(current_mat), y=0, label=as.Date(colnames(current_mat)), srt=35, adj=c(1,1), cex=0.6)
+mtext("Percentage of population reported as current COVID-19 cases", side=3, line=0.1, adj=0)
+mtext("(current = all confirmed - recovered - deaths)", side=3, line=0.1, adj=1, cex=0.8, col="darkgrey")
+legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75, inset=c(-0.17,-0.06))
+par(mar=c(3,4,2,1), xpd=T, bg="white")
+image(x=1:2, y=1:nrow(current_mat), z=t(cbind(apply(current_mat, 1, max), current_mat[,ncol(current_mat)])[ord,]), 
+      axes=FALSE, xlab="", ylab="", breaks=c(-1, seq(0, quantile(current_mat, prob=0.95), length.out=99), 100), 
+      col=c("grey97", colorpanel(99, "grey90", "#e2ae79")))
+max_dates <- format(as.Date(colnames(current_mat)[wmax][ord]), format="%B %d, %Y")
+axis(2, at=1:nrow(current_mat), label=max_dates, las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
+axis(2, at=nrow(current_mat)+1, label="Date of highest number", las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
+nums <- paste(signif(current_mat[cbind(1:nrow(current_mat),wmax)], 2), "%", sep="")
+text(x=1, y=1:nrow(current_mat), nums[ord], cex=0.5, font=2)
+nums <- paste(signif(current_mat[,ncol(current_mat)], 2), "%", sep="")
+text(x=2, y=1:nrow(current_mat), nums[ord], cex=0.5, font=2)
+string_date <- format(as.Date(tail(colnames(current_mat), 1)), format="%B %d")
+text(x=1:2, y=0, label=c("Highest (·)", paste("Current\n(", string_date, ")", sep="")), srt=35, adj=c(1,1), cex=0.6, font=2)
+dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  #system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
+  system(paste("convert -density 300 -background white -alpha remove ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
+}
+
+
+
+############################################################################################################################
 # More esotheric plots, of percentage of population/cases resulting in death/recovery
 # These are a lot more problematic to interpret, and more erratic in nature too because even smaller numbers
 ############################################################################################################################
+idxs <- head(intersect(intersect(order(-apply(confirmed_perc, 1, max, na.rm=T)), min_cases_100), min_pop_100), 20)
+
 fn <- "percentage_population_deaths_recovered_top20_min100"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
 par(mar=c(2,2,1,4), mfrow=c(1,2), cex=3, bg="white")

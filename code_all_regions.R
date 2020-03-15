@@ -96,7 +96,7 @@ idxs <- which(rowSums(confirmed > 10) >= 10) # Select only regions that have at 
 ############################################################################################################################
 
 ############################################################################################################################
-# Percentage daily increase in new confirmed cases, for each of the top 20 countries
+# Percentage daily increase in new confirmed cases.
 # Estimated over 10 day intervals, no data shown for intervals with less than 10 cases at each day
 # https://kenbenoit.net/assets/courses/ME104/logmodels2.pdf
 # https://rpubs.com/aaronsc32/regression-confidence-prediction-intervals
@@ -173,5 +173,6 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   #system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
   system(paste("convert -density 300 -background white -alpha remove ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
+
 
 
