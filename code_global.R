@@ -2,6 +2,7 @@
 ### Code for plotting COVID-19 case counts across countries
 ############################################################################################################################
 library(RColorBrewer)
+library(gplots)
 source("code_preprocess.R")
 
 ### Output directory

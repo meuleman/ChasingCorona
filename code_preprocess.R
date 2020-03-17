@@ -22,6 +22,31 @@ plotfile <- function(filename="Rplot", type="png", width=7, height=7, device="bi
 ### Function for generating a initial + date string ("WM" hardcoded -- Wouter Meuleman)
 id <- function() paste("WM", gsub("-", "", Sys.Date()), sep="")
 
+### Function to correct some labels for consistency between Worldbank and CSSE data
+fix_pop_label <- function(lab_old, lab_new) {
+  idx <- which(population$country_pop==lab_old)
+  if (length(idx) == 1) {
+    population[idx,"country_pop"] <<- lab_new; # global var, yikes!
+    print(paste("Changed Worldbank country label", lab_old, "to", lab_new))
+  } else {
+    print(paste("Did NOT change Worldbank country label", lab_old, "to", lab_new))
+  }
+}
+
+### Function to correct some CSSE country labels so that we can use them with the population data
+# For instance, because the Worldbank doesn't recognize certain areas as countries (e.g. Taiwan)
+fix_csse_label <- function(lab_old, lab_new) {
+  idx <- which(confirmed_all$Country.Region==lab_old)
+  if (length(idx) == 1) {
+    confirmed_all[idx,"Country.Region"] <<- lab_new; # global var, yikes!
+    deaths_all[idx,"Country.Region"] <<- lab_new; # global var, yikes!
+    recovered_all[idx,"Country.Region"] <<- lab_new; # global var, yikes!
+    print(paste("Changed CSSE country label", lab_old, "to", lab_new))
+  } else {
+    print(paste("Did NOT change CSSE country label", lab_old, "to", lab_new))
+  }
+}
+
 ############################################################################################################################
 ### Load in population counts from the Worldbank (https://data.worldbank.org/indicator/SP.POP.TOTL)
 pop_counts_file <- "WorldBank_data/API_SP.POP.TOTL_DS2_en_csv_v2_821007/API_SP.POP.TOTL_DS2_en_csv_v2_821007.csv";
@@ -31,24 +56,27 @@ pop_counts <- read.delim(pop_counts_file, skip=3, sep=",", header=T, as.is=T)
 population <- pop_counts[,c("Country.Name", "X2018")] #2019 is missing, so opting for 2018
 colnames(population) <- c("country_pop", "population")
 
-# Correct some labels for consistency between Worldbank and CSSE data
-population[population$country_pop=="Egypt, Arab Rep.","country_pop"] <- "Egypt";
-population[population$country_pop=="Macao SAR, China","country_pop"] <- "Macau";
-population[population$country_pop=="Hong Kong SAR, China","country_pop"] <- "Hong Kong";
-population[population$country_pop=="Iran, Islamic Rep.","country_pop"] <- "Iran";
-population[population$country_pop=="Korea, Rep.","country_pop"] <- "Korea, South";
-population[population$country_pop=="Russian Federation","country_pop"] <- "Russia";
-#population[population$country_pop=="Moldova","country_pop"] <- "Republic of Moldova";
-#population[population$country_pop=="China","country_pop"] <- "Mainland China";
-population[population$country_pop=="United States","country_pop"] <- "US";
-#population[population$country_pop=="United Kingdom","country_pop"] <- "UK";
-population[population$country_pop=="Slovak Republic","country_pop"] <- "Slovakia";
-population[population$country_pop=="Brunei Darussalam","country_pop"] <- "Brunei";
-population[population$country_pop=="Czech Republic","country_pop"] <- "Czechia";
+fix_pop_label("Egypt, Arab Rep.", "Egypt")
+fix_pop_label("Macao SAR, China", "Macau")
+fix_pop_label("Hong Kong SAR, China", "Hong Kong")
+fix_pop_label("Iran, Islamic Rep.", "Iran")
+fix_pop_label("Korea, Rep.", "Korea, South")
+fix_pop_label("Russian Federation", "Russia")
+#fix_pop_label("Moldova", "Republic of Moldova")
+#fix_pop_label("China", "Mainland China")
+fix_pop_label("United States", "US")
+#fix_pop_label("United Kingdom", "UK")
+fix_pop_label("Slovak Republic", "Slovakia")
+fix_pop_label("Brunei Darussalam", "Brunei")
+fix_pop_label("Czech Republic", "Czechia")
+fix_pop_label("Venezuela, RB", "Venezuela")
+fix_pop_label("St. Vincent and the Grenadines", "Saint Vincent and the Grenadines")
+fix_pop_label("Bahamas, The", "The Bahamas")
+fix_pop_label("St. Lucia", "Saint Lucia")
 
 # Merge some labels
-population[population$country_pop=="Congo, Rep.","country_pop"] <- "Congo";
-population[population$country_pop=="Congo, Dem. Rep.","country_pop"] <- "Congo";
+fix_pop_label("Congo, Rep.", "Congo")
+fix_pop_label("Congo, Dem. Rep.", "Congo")
 
 population <- aggregate(population$population, by=list(country_pop=population$country_pop), FUN=sum)
 colnames(population) <- c("country_pop", "population")
@@ -62,72 +90,36 @@ recovered_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Recovered.c
 colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <- 
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
-# Need to pool Taipei/Taiwan with Mainland China, as the Worldbank apparently does not recognize it.
-confirmed_all[confirmed_all$Country.Region=="Taipei and environs","Country.Region"] <- "China";
-deaths_all[deaths_all$Country.Region=="Taipei and environs","Country.Region"] <- "China";
-recovered_all[recovered_all$Country.Region=="Taipei and environs","Country.Region"] <- "China";
-# Same for Macao
-confirmed_all[confirmed_all$Country.Region=="Macao SAR","Country.Region"] <- "China";
-deaths_all[deaths_all$Country.Region=="Macao SAR","Country.Region"] <- "China";
-recovered_all[recovered_all$Country.Region=="Macao SAR","Country.Region"] <- "China";
-# Same for Taiwan
-confirmed_all[confirmed_all$Country.Region=="Taiwan*","Country.Region"] <- "China";
-deaths_all[deaths_all$Country.Region=="Taiwan*","Country.Region"] <- "China";
-recovered_all[recovered_all$Country.Region=="Taiwan*","Country.Region"] <- "China";
-# Same for Palestine
-confirmed_all[confirmed_all$Country.Region=="occupied Palestinian territory","Country.Region"] <- "Israel"; 
-deaths_all[deaths_all$Country.Region=="occupied Palestinian territory","Country.Region"] <- "Israel";
-recovered_all[recovered_all$Country.Region=="occupied Palestinian territory","Country.Region"] <- "Israel"; 
-# Same for Holy See
-confirmed_all[confirmed_all$Country.Region=="Holy See","Country.Region"] <- "Italy";
-deaths_all[deaths_all$Country.Region=="Holy See","Country.Region"] <- "Italy";
-recovered_all[recovered_all$Country.Region=="Holy See","Country.Region"] <- "Italy";
-# Same for Saint Barthelemy
-confirmed_all[confirmed_all$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
-deaths_all[deaths_all$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
-recovered_all[recovered_all$Country.Region=="Saint Barthelemy","Country.Region"] <- "France"; 
-# Same for Saint Martin
-confirmed_all[confirmed_all$Country.Region=="Saint Martin","Country.Region"] <- "France";
-deaths_all[deaths_all$Country.Region=="Saint Martin","Country.Region"] <- "France";
-recovered_all[recovered_all$Country.Region=="Saint Martin","Country.Region"] <- "France";
-# Same for Martinique
-confirmed_all[confirmed_all$Country.Region=="Martinique","Country.Region"] <- "France";
-deaths_all[deaths_all$Country.Region=="Martinique","Country.Region"] <- "France";
-recovered_all[recovered_all$Country.Region=="Martinique","Country.Region"] <- "France";
-# Same for French Guiana
-confirmed_all[confirmed_all$Country.Region=="French Guiana","Country.Region"] <- "France";
-deaths_all[deaths_all$Country.Region=="French Guiana","Country.Region"] <- "France";
-recovered_all[recovered_all$Country.Region=="French Guiana","Country.Region"] <- "France";
-# Same for Reunion
-confirmed_all[confirmed_all$Country.Region=="Reunion","Country.Region"] <- "France";
-deaths_all[deaths_all$Country.Region=="Reunion","Country.Region"] <- "France";
-recovered_all[recovered_all$Country.Region=="Reunion","Country.Region"] <- "France";
-# Rename Iran
-confirmed_all[confirmed_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
-deaths_all[deaths_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
-recovered_all[recovered_all$Country.Region=="Iran (Islamic Republic of)","Country.Region"] <- "Iran";
-# Rename Viet Nam
-confirmed_all[confirmed_all$Country.Region=="Viet Nam","Country.Region"] <- "Vietnam";
-deaths_all[deaths_all$Country.Region=="Viet Nam","Country.Region"] <- "Vietnam";
-recovered_all[recovered_all$Country.Region=="Viet Nam","Country.Region"] <- "Vietnam";
-# Rename Hong Kong
-confirmed_all[confirmed_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
-deaths_all[deaths_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
-recovered_all[recovered_all$Country.Region=="Hong Kong SAR","Country.Region"] <- "Hong Kong";
-# Rename Congo (Kinshasa)
-confirmed_all[confirmed_all$Country.Region=="Congo (Kinshasa)","Country.Region"] <- "Congo";
-deaths_all[deaths_all$Country.Region=="Congo (Kinshasa)","Country.Region"] <- "Congo";
-recovered_all[recovered_all$Country.Region=="Congo (Kinshasa)","Country.Region"] <- "Congo";
+fix_csse_label("Taipei and environs", "China")
+fix_csse_label("Macao SAR", "China")
+fix_csse_label("Taiwan*", "China")
+fix_csse_label("occupied Palestinian territory", "Israel")
+fix_csse_label("Holy See", "Italy")
+fix_csse_label("Saint Barthelemy", "France")
+fix_csse_label("Saint Martin", "France")
+fix_csse_label("Martinique", "France")
+fix_csse_label("French Guiana", "France")
+fix_csse_label("Reunion", "France")
+fix_csse_label("Guadeloupe", "France")
+fix_csse_label("Mayotte", "France")
+fix_csse_label("Guernsey", "United Kingdom")
+fix_csse_label("Jersey", "United Kingdom")
+fix_csse_label("Iran (Islamic Republic of)", "Iran")
+fix_csse_label("Viet Nam", "Vietnam")
+fix_csse_label("Hong Kong SAR", "Hong Kong")
+fix_csse_label("Congo (Kinshasa)", "Congo")
+fix_csse_label("Congo (Brazzaville)", "Congo")
+fix_csse_label("Republic of the Congo", "Congo")
 
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 confirmed_simple <- aggregate(confirmed_all[,-c(1:4)], by=list(country=confirmed_all$Country.Region), FUN=sum)
-deaths_simple <- aggregate(deaths_all[,-c(1:4)], by=list(country=deaths_all$Country.Region), FUN=sum)
+deaths_simple    <- aggregate(deaths_all[,-c(1:4)], by=list(country=deaths_all$Country.Region), FUN=sum)
 recovered_simple <- aggregate(recovered_all[,-c(1:4)], by=list(country=recovered_all$Country.Region), FUN=sum)
 
 # Match population data with COVID-19 data
-match_res <- match(confirmed_simple$country, population$country_pop)
+match_res     <- match(confirmed_simple$country, population$country_pop)
 confirmed_pop <- cbind(population[match_res,], confirmed_simple)
-deaths_pop <- cbind(population[match_res,], deaths_simple)
+deaths_pop    <- cbind(population[match_res,], deaths_simple)
 recovered_pop <- cbind(population[match_res,], recovered_simple)
 
 # All but one country should have been matched -- the unmatched is the Diamond Princess cruise ship.

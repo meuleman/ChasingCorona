@@ -26,6 +26,19 @@ plotfile <- function(filename="Rplot", type="png", width=7, height=7, device="bi
 ### Function for generating a initial + date string ("WM" hardcoded -- Wouter Meuleman)
 id <- function() paste("WM", gsub("-", "", Sys.Date()), sep="")
 
+### Function to correct some region labels to prevent duplicates
+fix_label <- function(lab_old, lab_new) {
+  to_change <- which(rownames(confirmed) == lab_old)
+  if (length(to_change) == 1) {
+    rownames(confirmed)[to_change] <<- lab_new # global var, yikes!
+    rownames(deaths)[to_change]    <<- lab_new
+    rownames(recovered)[to_change] <<- lab_new
+    print(paste("Changed region label", lab_old, "to", lab_new))
+  } else {
+    print(paste("Did NOT change region label", lab_old, "to", lab_new))
+  }
+}
+
 ############################################################################################################################
 
 ### Output directory
@@ -52,23 +65,15 @@ if(all(is.na(confirmed[,ncol(confirmed)]))) {
  recovered <- recovered[,-ncol(recovered)]
 }
 
+metadata$Province.State <- ifelse(metadata$Province.State == metadata$Country.Region, "", metadata$Province.State)
+
 colnames(confirmed) <- colnames(deaths) <- colnames(recovered) <- 
   as.character(as.Date(colnames(confirmed), format="X%m.%d.%y"))
 rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
   gsub("^ - ", "", paste(metadata$Province.State, metadata$Country.Region, sep=" - "))
 
-to_change <- which(rownames(confirmed) == "United Kingdom - United Kingdom")
-if (!is.null(to_change)) {
-  rownames(confirmed)[to_change] <- "United Kingdom"
-  rownames(deaths)[to_change] <- "United Kingdom"
-  rownames(recovered)[to_change] <- "United Kingdom"
-}
-to_change <- which(rownames(confirmed) == "France - France")
-if (!is.null(to_change)) {
-  rownames(confirmed)[to_change] <- "France"
-  rownames(deaths)[to_change] <- "France"
-  rownames(recovered)[to_change] <- "France"
-}
+fix_label("Diamond Princess - Cruise Ship", "Cruise Ship")
+
 to_rm <- which(rownames(confirmed) == "Diamond Princess - US")
 if (!is.null(to_rm)) {
   confirmed <- confirmed[-to_rm,]
@@ -91,7 +96,7 @@ confirmed <- rbind(confirmed, confirmed_agg[-to_rm,])
 deaths <- rbind(deaths, deaths_agg[-to_rm,])
 recovered <- rbind(recovered, recovered_agg[-to_rm,])
 
-idxs <- which(rowSums(confirmed > 10) >= 10) # Select only regions that have at least 10 days with more than 10 cases
+idxs <- which(rowSums(confirmed > 10) > 10) # Select only regions that have at least 10 days with more than 10 cases
 
 ############################################################################################################################
 
