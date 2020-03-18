@@ -11,22 +11,29 @@ More information here: https://www.meuleman.org/project/chasingcorona/
 **DISCLAIMER**: I am not a virologist or epidemiologist – I realize there are many caveats to interpreting these data.\
 We do not nearly have enough data to make precise estimates, in particular because of the relatively small number of tests performed in most countries.
 
-### Percentage of population that are confirmed cases
+#### Percentage of population that are confirmed cases
+
+This is essentially the Johns Hopkins University per-country [data](https://github.com/CSSEGISandData/COVID-19) for "confirmed cases", 
+divided by the per-country 2018 population counts, as estimated and provided by the [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL).
+Shown are the top 20 countries in terms of highest percent population confirmed to be COVID-19 cases.
 
 ![perc. of population confirmed](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_confirmed_top20_min100_fromMar01_latest.png "% of per-country population that are confirmed cases")
 
+Data are shown on a linear and a logarithmic scale, because of the observed exponential growth of confirmed cases.
 
-### Daily growth of newly confirmed cases
+#### Daily growth of newly confirmed cases
 
 The slope of the exponential curves tells us something about how fast the virus spreads.
-Here we have expressed these rates in terms of daily percent new cases, based on the number of confirmed cases over the course of the 10 previous days:
+These rates can be expressed in terms of daily percent new cases, based on the number of confirmed cases over the course of the 10 previous days:
 ![perc. daily confirmed new cases, examples](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_top20_fromFeb15_latest.png "% daily confirmed new cases")
+Data shown for selected example countries from the top 20 list above).
+Percentages on the right are for the most recent date indicated and include 95% confidence interval ranges.
 
-This can be extended to all countries and regions with enough data points:
+This growth over time can be further generalized across all countries and regions with sufficient data points, as such:
 ![perc. daily confirmed new cases, all](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning_latest.png "% daily confirmed new cases, all")
 
 
-### Additional figures
+#### Additional figures
 
 <!--
 The following figures are even harder to interpret than the one shown above.
