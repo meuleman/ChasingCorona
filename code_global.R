@@ -49,12 +49,12 @@ plot_absolute_numbers <- function(confirmed, idxs, cols, xlim=NULL, logscale=FAL
   layout(matrix(1:2, ncol=2), width=c(7,3))
   par(oma=c(2,2,1,0), bg="white", cex=2, mar=c(0,0,0,4))
   if (is.null(xlim)) xlim <- range(as.Date(colnames(confirmed)))
+  xlim_range <- which(as.Date(colnames(confirmed)) %in% xlim)
   dat_to_plot <- confirmed[idxs,]
   dat_to_plot[dat_to_plot==0] <- NA
   plot(as.Date(colnames(confirmed)), rep(1, ncol(confirmed)),
-       type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log=ifelse(logscale, "y", ""), 
-       xlim=xlim, ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
-       #xlim=xlim, ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
+       type="n", yaxt="n", xaxs="i", xlab="", ylab="", log=ifelse(logscale, "y", ""), 
+       xlim=xlim, ylim=range(dat_to_plot[,xlim_range[1]:xlim_range[2]], na.rm=T))
   for (i in 1:length(idxs)) {
     lines(as.Date(colnames(confirmed)), confirmed[idxs[i],], col=cols[i], lwd=5)
   }
@@ -94,15 +94,17 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 ############################################################################################################################
 # Percentage of per-country population that affected (confirmed cases), for each of the top 20 countries
 ############################################################################################################################
-plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=NULL, logscale=FALSE) {
-  layout(matrix(1:2, ncol=2), width=c(7,3))
+plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=NULL) {
+  layout(matrix(1:3, ncol=3), width=c(7,7,3))
   par(oma=c(2,2,1,0), bg="white", cex=2, mar=c(0,0,0,4))
-  if (is.null(xlim)) xlim <- range(as.Date(colnames(confirmed)))
+  if (is.null(xlim)) xlim <- range(as.Date(colnames(confirmed_perc)))
+  xlim_range <- which(as.Date(colnames(confirmed_perc)) %in% xlim)
   dat_to_plot <- confirmed_perc[idxs,]
   dat_to_plot[dat_to_plot==0] <- NA
+  # linear scale
   plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
-       type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log=ifelse(logscale, "y", ""), 
-       xlim=xlim, ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
+       type="n", yaxt="n", xaxs="i", xlab="", ylab="", log="", 
+       xlim=xlim, ylim=range(dat_to_plot[,xlim_range[1]:xlim_range[2]], na.rm=T))
   lines(as.Date(colnames(confirmed_perc)), confirmed_perc_mean, col="black", lwd=5)
   for (i in 1:length(idxs)) {
     lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
@@ -110,7 +112,24 @@ plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idx
   axis(1, labels=F, at=as.Date(colnames(confirmed_perc)), tcl=-0.25)
   axis(4, las=2)
   mtext("% of population", side=2, line=0.5, cex=2)
-  legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+  #legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+  legend("topleft", "(x,y)", "linear scale", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.col="grey")
+  mtext("a", side=3, line=0.1, adj=0, cex=2, font=2)
+  # log scale
+  plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
+       type="n", yaxt="n", xaxs="i", xlab="", ylab="", log="y", 
+       xlim=xlim, ylim=range(dat_to_plot[,xlim_range[1]:xlim_range[2]], na.rm=T))
+  lines(as.Date(colnames(confirmed_perc)), confirmed_perc_mean, col="black", lwd=5)
+  for (i in 1:length(idxs)) {
+    lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
+  }
+  axis(1, labels=F, at=as.Date(colnames(confirmed_perc)), tcl=-0.25)
+  axis(4, las=2)
+#  mtext("% of population", side=2, line=0.5, cex=2)
+#  legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+  legend("topleft", "(x,y)", "logarithmic scale", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.col="grey")
+  mtext("b", side=3, line=0.1, adj=0, cex=2, font=2)
+
   par(mar=c(0,0,0,0))
   plot(0, type="n", axes=FALSE)
   labs <- c(rownames(confirmed_perc)[idxs], "World-wide")
@@ -123,19 +142,27 @@ plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idx
   legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 }
 
-fn <- "percentage_population_confirmed_top20_min100"
+fn <- "percentage_population_confirmed_top20_min100_fromFeb15"
 xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim, logscale=FALSE)
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
+plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_population_confirmed_top20_min100_log"
-xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim, logscale=TRUE)
+fn <- "percentage_population_confirmed_top20_min100_fromMar01"
+xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed_perc), 1)))
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
+plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim)
+dev.off()
+if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
+  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
+}
+
+fn <- "percentage_population_confirmed_top20_min100_fromBeginning"
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
+plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
@@ -175,11 +202,22 @@ confint_lo <- (10^(confint_arr[,,1])-1)*100
 confint_hi <- (10^(confint_arr[,,2])-1)*100
 coeff_mat <- ((10^coeff_mat)-1)*100
 
-
 plot_percentage_daily_increase <- function(coeff_mat, confint_lo, confint_hi, cols, xlim=NULL) {
   layout(matrix(1:2, ncol=2), width=c(7,3))
   par(oma=c(2,2,1,0), bg="white", cex=2, mar=c(0,0,0,4))
   if (is.null(xlim)) xlim <- range(as.Date(colnames(coeff_mat)))
+  xlim_range <- which(as.Date(colnames(coeff_mat)) %in% xlim)
+
+  to_rm <- which(rowSums(is.na(coeff_mat[,xlim_range[1]:xlim_range[2]])) > 0)
+  if (length(to_rm) == nrow(coeff_mat)) {
+    return("No regions without missing data")
+  } else if (length(to_rm) > 0) {
+    coeff_mat <- coeff_mat[-to_rm,]
+    confint_lo <- confint_lo[-to_rm,]
+    confint_hi <- confint_hi[-to_rm,]
+    cols <- cols[-to_rm]
+  }
+
   plot(as.Date(colnames(coeff_mat)), rep(0, ncol(coeff_mat)), type="n", yaxt="n", xaxs="i", 
        xlab="", ylab="", xlim=xlim, ylim=range(c(confint_lo, confint_hi), na.rm=T))
   for (i in 1:nrow(coeff_mat)) { # Confidence Interval (CI) regions
@@ -218,21 +256,10 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 }
 
 fn <- "percentage_daily_change_10days_cases_confirmed_top20_fromFeb15"
-#xlim <- as.Date(c("2020-01-25", tail(colnames(confirmed), 1)))
-#xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed), 1)))
 xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed), 1)))
 #plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
 pdf(file=paste0(figdir, "/", fn, "_", id(), ".pdf"), width=14,height=8) # for alpha transparency
 plot_percentage_daily_increase(coeff_mat, confint_lo, confint_hi, cols, xlim=xlim)
-dev.off()
-if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
-}
-
-fn <- "percentage_daily_change_10days_cases_confirmed_top20_fromBeginning"
-#plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-pdf(file=paste0(figdir, "/", fn, "_", id(), ".pdf"), width=14,height=8) # for alpha transparency
-plot_percentage_daily_increase(coeff_mat, confint_lo, confint_hi, cols)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
@@ -245,8 +272,8 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 ### Percentage of population with current cases
 current <- confirmed - recovered - deaths
 current_perc <- sweep(current, 1, population, FUN="/") * 100
-idxs <- intersect(intersect(which(rowSums(current > 10) >= 10), min_cases_100), min_pop_100)
-#idxs <- which(rowSums(current > 10) >= 10) # Select only regions/countries that have 10+ days with more than 10 current cases
+idxs <- intersect(intersect(which(rowSums(current > 10) > 10), min_cases_100), min_pop_100)
+#idxs <- which(rowSums(current > 10) > 10) # Select only regions/countries that have 10+ days with more than 10 current cases
 current_mat <- as.matrix(current_perc[idxs,])
 ord <- order(apply(current_mat, 1, which.max), -apply(current_mat, 1, max), decreasing=TRUE)
 
@@ -283,84 +310,5 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 300 -background white -alpha remove ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-
-
-############################################################################################################################
-# More esotheric plots, of percentage of population/cases resulting in death/recovery
-# These are a lot more problematic to interpret, and more erratic in nature too because even smaller numbers
-############################################################################################################################
-idxs <- head(intersect(intersect(order(-apply(confirmed_perc, 1, max, na.rm=T)), min_cases_100), min_pop_100), 20)
-
-fn <- "percentage_population_deaths_recovered_top20_min100"
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
-par(mar=c(2,2,1,4), mfrow=c(1,2), cex=3, bg="white")
-string_date <- format(as.Date(tail(colnames(deaths_perc), 1)), format="%B %d, %Y")
-# Deaths
-plot(as.Date(colnames(deaths_perc)), rep(0, ncol(deaths_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(deaths_perc[idxs,], na.rm=T)), 
-     xlab="", ylab="", main=string_date)
-lines(as.Date(colnames(deaths_perc)), deaths_perc_mean, col="black", lwd=5)
-for (i in 1:length(idxs)) {
-  lines(as.Date(colnames(deaths_perc)), deaths_perc[idxs[i],], col=cols[i], lwd=5)
-}
-axis(1, labels=F, at=as.Date(colnames(recovered_perc)), tcl=-0.25)
-axis(4, las=2)
-mtext("% of population", side=2, line=0.5, cex=3)
-legend("topleft", "(x,y)", "Deaths", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-box()
-# Recovered
-plot(as.Date(colnames(recovered_perc)), rep(0, ncol(recovered_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(recovered_perc[idxs,], na.rm=T)), 
-     xlab="", ylab="", main=string_date)
-lines(as.Date(colnames(recovered_perc)), recovered_perc_mean, col="black", lwd=5)
-for (i in 1:length(idxs)) {
-  lines(as.Date(colnames(recovered_perc)), recovered_perc[idxs[i],], col=cols[i], lwd=5)
-}
-axis(1, labels=F, at=as.Date(colnames(recovered_perc)), tcl=-0.25)
-axis(4, las=2)
-mtext("% of population", side=2, line=0.5, cex=3)
-legend("topleft", "(x,y)", "Recovered", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-box()
-dev.off()
-if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
-}
-
-fn <- "percentage_cases_deaths_recovered_top20_min100"
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=4)
-par(mar=c(2,2,1,4), mfrow=c(1,2), cex=3, bg="white")
-string_date <- format(as.Date(tail(colnames(deaths_perc), 1)), format="%B %d, %Y")
-# Plot percentage of cases resulting in deaths
-plot(as.Date(colnames(confirmed_deaths_perc)), rep(0, ncol(confirmed_deaths_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(confirmed_deaths_perc, na.rm=T)), 
-     xlab="", ylab="", main=string_date)
-lines(as.Date(colnames(confirmed_deaths_perc)), confirmed_deaths_perc_mean, col="black", lwd=5)
-for (i in 1:length(idxs)) {
-  idx <- rownames(confirmed_perc)[idxs[i]]
-  lines(as.Date(colnames(confirmed_deaths_perc)), confirmed_deaths_perc[idx,], col=cols[i], lwd=5)
-}
-axis(1, labels=F, at=as.Date(colnames(confirmed_deaths_perc)), tcl=-0.25)
-axis(4, las=2)
-mtext("% of confirmed cases", side=2, line=0.5, cex=3)
-legend("topleft", "(x,y)", "Deaths", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-box()
-# Plot percentage of cases resulting in recovery
-plot(as.Date(colnames(confirmed_recovered_perc)), rep(0, ncol(confirmed_recovered_perc)), 
-     type="n", yaxt="n", xaxs="i", yaxs="i", ylim=c(0, max(confirmed_recovered_perc, na.rm=T)), 
-     xlab="", ylab="", main=string_date)
-lines(as.Date(colnames(confirmed_recovered_perc)), confirmed_recovered_perc_mean, col="black", lwd=5)
-for (i in 1:length(idxs)) {
-  idx <- rownames(confirmed_perc)[idxs[i]]
-  lines(as.Date(colnames(confirmed_recovered_perc)), confirmed_recovered_perc[idx,], col=cols[i], lwd=5)
-}
-axis(1, labels=F, at=as.Date(colnames(confirmed_recovered_perc)), tcl=-0.25)
-axis(4, las=2)
-mtext("% of confirmed cases", side=2, line=0.5, cex=3)
-legend("topleft", "(x,y)", "Recovered", inset=c(-0.05,0.005), bty="n", cex=1.25, text.font=4)
-box()
-dev.off()
-if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
-  system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
-}
 
 

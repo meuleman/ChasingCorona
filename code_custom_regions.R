@@ -1,5 +1,5 @@
 ############################################################################################################################
-### Code for plotting a number of custom derivative views
+### Code for plotting a number of custom figures based on selected regions of interest
 ############################################################################################################################
 library(RColorBrewer)
 source("code_preprocess.R")
@@ -20,6 +20,7 @@ recovered_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Recovered.c
 colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <-
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
+### Note that these are currently (March 17, 2020) not properly being reported anymore
 nam <- "Washington State"
 population[nam] <- 7535591
 idxs <- grep(", WA$", confirmed_all$Province.State);

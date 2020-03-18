@@ -130,6 +130,15 @@ for (i in 1:length(idxs)) {
     }
   }
 }
+
+# remove entries with only non-positive values
+to_rm <- which(rowSums(coeff_mat > 0, na.rm=T) == 0)
+if (length(to_rm) > 0) {
+  idxs <- idxs[-to_rm]
+  coeff_mat <- coeff_mat[-to_rm,]
+  confint_arr <- confint_arr[-to_rm,,]
+} 
+
 # convert to percentages
 confint_lo <- (10^(confint_arr[,,1])-1)*100
 confint_hi <- (10^(confint_arr[,,2])-1)*100
@@ -152,7 +161,7 @@ points(wmax[ord], 1:nrow(coeff_mat_noNA), pch=16, cex=0.2)
 axis(4, at=1:nrow(coeff_mat_noNA), label=rownames(coeff_mat_noNA)[ord], las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
 text(x=1:ncol(coeff_mat_noNA), y=0, label=as.Date(colnames(coeff_mat_noNA)), srt=35, adj=c(1,1), cex=0.6)
 mtext("Percent daily growth of number of confirmed cases", side=3, line=0.1, adj=0)
-mtext("(estimated across 10 day intervals, requiring 10+ cases per day)", side=3, line=0.1, adj=1, cex=0.8, col="darkgrey")
+mtext(paste("(estimated across", nrange, "day intervals, requiring 10+ cases per day)"), side=3, line=0.1, adj=1, cex=0.8, col="darkgrey")
 legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75, inset=c(-0.17,-0.06))
 par(mar=c(3,4,2,1), xpd=T, bg="white")
 image(x=1:2, y=1:nrow(coeff_mat_noNA), z=t(cbind(apply(coeff_mat_noNA, 1, max), coeff_mat_noNA[,ncol(coeff_mat_noNA)])[ord,]), 
