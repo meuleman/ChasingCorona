@@ -26,8 +26,8 @@ Data are shown on a linear and a logarithmic scale, because of the observed expo
 The slope of the exponential curves tells us something about how fast the virus spreads.
 These rates can be expressed in terms of daily percent new cases, based on the number of confirmed cases over the course of the 10 previous days:
 ![perc. daily confirmed new cases, examples](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_top20_fromFeb15_latest.png "% daily confirmed new cases")
-Data shown for selected example countries from the top 20 list above).
-Percentages on the right are for the most recent date indicated and include 95% confidence interval ranges.
+Data shown for selected example countries from the top 20 list above.
+Percentages on the right are 10-day average daily growth rates for the most recent date indicated and include 95% confidence interval ranges.
 
 This growth over time can be further generalized across all countries and regions with sufficient data points, as such:
 ![perc. daily confirmed new cases, all](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning_latest.png "% daily confirmed new cases, all")
@@ -52,7 +52,7 @@ Population-normalized view for King County, Washington State (where I live) and 
 -->
 
 Number of confirmed cases on a logarithmic scale:
-![number of confirmed cases per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_top20_min100_log_latest.png "number of confirmed COVID-19 cases per country")
+![number of confirmed cases per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_top20_min100_fromBeginning_latest.png "number of confirmed COVID-19 cases per country")
 
 
 
