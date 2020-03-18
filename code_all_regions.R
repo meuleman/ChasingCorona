@@ -96,7 +96,8 @@ confirmed <- rbind(confirmed, confirmed_agg[-to_rm,])
 deaths <- rbind(deaths, deaths_agg[-to_rm,])
 recovered <- rbind(recovered, recovered_agg[-to_rm,])
 
-idxs <- which(rowSums(confirmed > 10) > 10) # Select only regions that have at least 10 days with more than 10 cases
+idxs <- which(rowSums(confirmed > 10, na.rm=F) > 10) # Select only regions that have at least 10 days with more than 10 cases
+# na.rm=F makes sure these are also regions where we have at least some data for ALL days (incl. current day).
 
 ############################################################################################################################
 

@@ -72,6 +72,7 @@ fix_pop_label("Czech Republic", "Czechia")
 fix_pop_label("Venezuela, RB", "Venezuela")
 fix_pop_label("St. Vincent and the Grenadines", "Saint Vincent and the Grenadines")
 fix_pop_label("Bahamas, The", "The Bahamas")
+fix_pop_label("Gambia, The", "The Gambia")
 fix_pop_label("St. Lucia", "Saint Lucia")
 
 # Merge some labels
@@ -146,6 +147,16 @@ if(all(is.na(confirmed[,ncol(confirmed)]))) {
  confirmed <- confirmed[,-ncol(confirmed)]
  deaths <- deaths[,-ncol(deaths)]
  recovered <- recovered[,-ncol(recovered)]
+}
+
+idx_undef <- which(is.na(confirmed[,ncol(confirmed)]))
+if (length(idx_undef) > 0) {
+  warning(paste(length(idx_undef), "regions with undefined amount of cases on last day"))
+}
+
+idx_zero <- which(confirmed[,ncol(confirmed)] == 0)
+if (length(idx_zero) > 0) {
+  warning(paste(length(idx_zero), "regions with zero cases on last day"))
 }
 
 ### Construct date string for showing in figures.
