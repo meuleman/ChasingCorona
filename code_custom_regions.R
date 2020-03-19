@@ -21,19 +21,19 @@ colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <-
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
 ### Note that these are currently (March 17, 2020) not properly being reported anymore
-nam <- "Washington State"
+nam <- "Washington, US"
 population[nam] <- 7535591
-idxs <- grep(", WA$", confirmed_all$Province.State);
+idxs <- c(grep(", WA$", confirmed_all$Province.State), which(confirmed_all$Province.State == "Washington"));
 confirmed[nam,] <- colSums(confirmed_all[idxs,-c(1:4)])
 deaths[nam,] <- colSums(deaths_all[idxs,-c(1:4)])
 recovered[nam,] <- colSums(recovered_all[idxs,-c(1:4)])
 
-nam <- "King County, WA"
-population[nam] <- 2190200
-idxs <- grep("^King County, WA$", confirmed_all$Province.State);
-confirmed[nam,] <- colSums(confirmed_all[idxs,-c(1:4)])
-deaths[nam,] <- colSums(deaths_all[idxs,-c(1:4)])
-recovered[nam,] <- colSums(recovered_all[idxs,-c(1:4)])
+#nam <- "King County, WA"
+#population[nam] <- 2190200
+#idxs <- grep("^King County, WA$", confirmed_all$Province.State);
+#confirmed[nam,] <- colSums(confirmed_all[idxs,-c(1:4)])
+#deaths[nam,] <- colSums(deaths_all[idxs,-c(1:4)])
+#recovered[nam,] <- colSums(recovered_all[idxs,-c(1:4)])
 
 ############################################################################################################################
 
@@ -57,20 +57,23 @@ confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
 confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 
 # Selection of countries
-idxs <- which(rownames(confirmed_perc) %in% c("Italy", "King County, WA", "Washington State", "Netherlands"))
+#idxs <- which(rownames(confirmed_perc) %in% c("Italy", "King County, WA", "Washington State", "Netherlands"))
+idxs <- match(c("Italy", "Washington, US", "Netherlands"), rownames(confirmed_perc))
 cols <- brewer.pal(9, "Set1")
 cols <- cols[1:length(idxs)]
 
 ############################################################################################################################
-plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=NULL, logscale=FALSE) {
-  layout(matrix(1:2, ncol=2), width=c(7,3))
+plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=NULL) {
+  layout(matrix(1:3, ncol=3), width=c(7,7,3))
   par(oma=c(2,2,1,0), bg="white", cex=2, mar=c(0,0,0,4))
-  if (is.null(xlim)) xlim <- range(as.Date(colnames(confirmed)))
+  if (is.null(xlim)) xlim <- range(as.Date(colnames(confirmed_perc)))
+  xlim_range <- which(as.Date(colnames(confirmed_perc)) %in% xlim)
   dat_to_plot <- confirmed_perc[idxs,]
   dat_to_plot[dat_to_plot==0] <- NA
+  # linear scale
   plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
-       type="n", yaxt="n", xaxs="i", yaxs="i", xlab="", ylab="", log=ifelse(logscale, "y", ""), 
-       xlim=xlim, ylim=range(dat_to_plot[,as.Date(colnames(dat_to_plot)) %in% xlim], na.rm=T))
+       type="n", yaxt="n", xaxs="i", xlab="", ylab="", log="", 
+       xlim=xlim, ylim=range(dat_to_plot[,xlim_range[1]:xlim_range[2]], na.rm=T))
   lines(as.Date(colnames(confirmed_perc)), confirmed_perc_mean, col="black", lwd=5)
   for (i in 1:length(idxs)) {
     lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
@@ -78,7 +81,24 @@ plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idx
   axis(1, labels=F, at=as.Date(colnames(confirmed_perc)), tcl=-0.25)
   axis(4, las=2)
   mtext("% of population", side=2, line=0.5, cex=2)
-  legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+  #legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+  legend("topleft", "(x,y)", "linear scale", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.col="grey")
+  mtext("a", side=3, line=0.1, adj=0, cex=2, font=2)
+  # log scale
+  plot(as.Date(colnames(confirmed_perc)), rep(0, ncol(confirmed_perc)), 
+       type="n", yaxt="n", xaxs="i", xlab="", ylab="", log="y", 
+       xlim=xlim, ylim=range(dat_to_plot[,xlim_range[1]:xlim_range[2]], na.rm=T))
+  lines(as.Date(colnames(confirmed_perc)), confirmed_perc_mean, col="black", lwd=5)
+  for (i in 1:length(idxs)) {
+    lines(as.Date(colnames(confirmed_perc)), confirmed_perc[idxs[i],], col=cols[i], lwd=5)
+  }
+  axis(1, labels=F, at=as.Date(colnames(confirmed_perc)), tcl=-0.25)
+  axis(4, las=2)
+#  mtext("% of population", side=2, line=0.5, cex=2)
+#  legend("topleft", "(x,y)", "Confirmed cases", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.font=4)
+  legend("topleft", "(x,y)", "logarithmic scale", inset=c(-0.08,-0.02), bty="n", cex=1.25, text.col="grey")
+  mtext("b", side=3, line=0.1, adj=0, cex=2, font=2)
+
   par(mar=c(0,0,0,0))
   plot(0, type="n", axes=FALSE)
   labs <- c(rownames(confirmed_perc)[idxs], "World-wide")
@@ -91,19 +111,19 @@ plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idx
   legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 }
 
-fn <- "percentage_population_confirmed_custom"
+fn <- "percentage_population_confirmed_custom_fromFeb15"
 xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim, logscale=FALSE)
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
+plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_population_confirmed_custom_log"
-xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=14, height=8)
-plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim, logscale=TRUE)
+fn <- "percentage_population_confirmed_custom_fromMar01"
+xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed_perc), 1)))
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
+plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))

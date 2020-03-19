@@ -92,8 +92,8 @@ plot_absolute_numbers <- function(confirmed, idxs, cols, xlim=NULL) {
   legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 }
 
-fn <- "absolute_numbers_top20_min100_fromFeb15"
-xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
+fn <- "absolute_numbers_top20_min100_fromMar01"
+xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed_perc), 1)))
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_absolute_numbers(confirmed, idxs, cols, xlim=xlim)
 dev.off()
@@ -101,8 +101,8 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "absolute_numbers_top20_min100_fromMar01"
-xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed_perc), 1)))
+fn <- "absolute_numbers_top20_min100_fromFeb15"
+xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_absolute_numbers(confirmed, idxs, cols, xlim=xlim)
 dev.off()
@@ -169,8 +169,8 @@ plot_population_percentages <- function(confirmed_perc, confirmed_perc_mean, idx
   legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75)
 }
 
-fn <- "percentage_population_confirmed_top20_min100_fromFeb15"
-xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
+fn <- "percentage_population_confirmed_top20_min100_fromMar01"
+xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed_perc), 1)))
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim)
 dev.off()
@@ -178,8 +178,8 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_population_confirmed_top20_min100_fromMar01"
-xlim <- as.Date(c("2020-03-01", tail(colnames(confirmed_perc), 1)))
+fn <- "percentage_population_confirmed_top20_min100_fromFeb15"
+xlim <- as.Date(c("2020-02-15", tail(colnames(confirmed_perc), 1)))
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_population_percentages(confirmed_perc, confirmed_perc_mean, idxs, cols, xlim=xlim)
 dev.off()

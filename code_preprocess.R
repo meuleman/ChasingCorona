@@ -72,8 +72,9 @@ fix_pop_label("Czech Republic", "Czechia")
 fix_pop_label("Venezuela, RB", "Venezuela")
 fix_pop_label("St. Vincent and the Grenadines", "Saint Vincent and the Grenadines")
 fix_pop_label("Bahamas, The", "The Bahamas")
-fix_pop_label("Gambia, The", "The Gambia")
+#fix_pop_label("Gambia, The", "The Gambia")
 fix_pop_label("St. Lucia", "Saint Lucia")
+fix_pop_label("Kyrgyz Republic", "Kyrgyzstan")
 
 # Merge some labels
 fix_pop_label("Congo, Rep.", "Congo")

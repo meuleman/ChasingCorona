@@ -96,6 +96,39 @@ confirmed <- rbind(confirmed, confirmed_agg[-to_rm,])
 deaths <- rbind(deaths, deaths_agg[-to_rm,])
 recovered <- rbind(recovered, recovered_agg[-to_rm,])
 
+### Attempt to parse US state data to be able to include these as well
+state_mapping <- c("Alabama"="AL", "Alaska"="AK", "Arizona"="AZ", "Arkansas"="AR", "California"="CA",
+  "Colorado"="CO", "Connecticut"="CT", "Delaware"="DE", "District of Columbia"="DC", "Florida"="FL",
+  "Georgia"="GA", "Hawaii"="HI", "Idaho"="ID", "Illinois"="IL", "Indiana"="IN", "Iowa"="IA",
+  "Kansas"="KS", "Kentucky"="KY", "Louisiana"="LA", "Maine"="ME", "Montana"="MT", "Nebraska"="NE",
+  "Nevada"="NV", "New Hampshire"="NH", "New Jersey"="NJ", "New Mexico"="NM", "New York"="NY",
+  "North Carolina"="NC", "North Dakota"="ND", "Ohio"="OH", "Oklahoma"="OK", "Oregon"="OR",
+  "Maryland"="MD", "Massachusetts"="MA", "Michigan"="MI", "Minnesota"="MN", "Mississippi"="MS",
+  "Missouri"="MO", "Pennsylvania"="PA", "Rhode Island"="RI", "South Carolina"="SC",
+  "South Dakota"="SD", "Tennessee"="TN", "Texas"="TX", "Utah"="UT", "Vermont"="VT", "Virginia"="VA",
+  "Washington"="WA", "West Virginia"="WV", "Wisconsin"="WI", "Wyoming"="WY")
+
+for (state in names(state_mapping)) {
+  #print(state)
+  state_lab <- paste(state, "- US")
+  if (nrow(confirmed[state_lab,]) == 1) {
+    state_counties <- grep(paste(",", state_mapping[state], "- US$"), rownames(confirmed))
+    if (length(state_counties) > 0) {
+      if (all(pmin(confirmed[state_lab,], colSums(confirmed[state_counties,], na.rm=T)) == 0)) {
+        confirmed[paste(state, "- US"),] <- confirmed[state_lab,] + colSums(confirmed[state_counties,], na.rm=T)
+        deaths[paste(state, "- US"),] <- deaths[state_lab,] + colSums(deaths[state_counties,], na.rm=T)
+        recovered[paste(state, "- US"),] <- recovered[state_lab,] + colSums(recovered[state_counties,], na.rm=T)
+      } else {
+        warning(paste("Potential conflicting state-wide vs. county-wide data for", state, "state"))
+      }
+    } else {
+      print(paste("No county data found for", state, "state"))
+    }
+  } else {
+    print(paste("No data found for", state, "state"))
+  }
+}
+
 idxs <- which(rowSums(confirmed > 10, na.rm=F) > 10) # Select only regions that have at least 10 days with more than 10 cases
 # na.rm=F makes sure these are also regions where we have at least some data for ALL days (incl. current day).
 
@@ -151,15 +184,15 @@ coeff_mat_noNA <- coeff_mat_noNA[,colSums(coeff_mat_noNA) > 0]
 ord <- order(apply(coeff_mat_noNA, 1, which.max), -apply(coeff_mat_noNA, 1, max), decreasing=TRUE)
 
 fn <- "percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning"
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=13, height=8)
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=13, height=9)
 layout(matrix(1:2, ncol=2), widths=c(10,2))
 par(mar=c(3,2,2,8), xpd=T, bg="white")
 image(x=1:ncol(coeff_mat_noNA), y=1:nrow(coeff_mat_noNA), z=t(coeff_mat_noNA[ord,]), axes=FALSE, xlab="", ylab="",
       breaks=c(-1, seq(0.5, max(coeff_mat_noNA), length.out=99), 100), col=c("grey97", colorpanel(99, "grey90", "#e2ae79")))
 wmax <- apply(coeff_mat_noNA, 1, which.max)
 points(wmax[ord], 1:nrow(coeff_mat_noNA), pch=16, cex=0.2)
-axis(4, at=1:nrow(coeff_mat_noNA), label=rownames(coeff_mat_noNA)[ord], las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
-text(x=1:ncol(coeff_mat_noNA), y=0, label=as.Date(colnames(coeff_mat_noNA)), srt=35, adj=c(1,1), cex=0.6)
+axis(4, at=1:nrow(coeff_mat_noNA), label=rownames(coeff_mat_noNA)[ord], las=2, tick=FALSE, cex.axis=0.5, line=-0.8)
+text(x=1:ncol(coeff_mat_noNA), y=0, label=as.Date(colnames(coeff_mat_noNA)), srt=35, adj=c(1,1), cex=0.5)
 mtext("Percent daily growth of number of confirmed cases", side=3, line=0.1, adj=0)
 mtext(paste("(estimated across", nrange, "day intervals, requiring 10+ cases per day)"), side=3, line=0.1, adj=1, cex=0.8, col="darkgrey")
 legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75, inset=c(-0.17,-0.06))
@@ -170,8 +203,8 @@ image(x=1:2, y=1:nrow(coeff_mat_noNA), z=t(cbind(apply(coeff_mat_noNA, 1, max), 
       breaks=c(-1, seq(0.5, max(coeff_mat_noNA), length.out=99), 100), col=c("grey97", colorpanel(99, "grey90", "#e2ae79")))
 wmax <- apply(coeff_mat, 1, which.max)
 max_dates <- format(as.Date(colnames(coeff_mat)[wmax][ord]), format="%B %d, %Y")
-axis(2, at=1:nrow(coeff_mat_noNA), label=max_dates, las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
-axis(2, at=nrow(coeff_mat_noNA)+1.2, label="Date of highest growth", las=2, tick=FALSE, cex.axis=0.6, line=-0.8)
+axis(2, at=1:nrow(coeff_mat_noNA), label=max_dates, las=2, tick=FALSE, cex.axis=0.5, line=-0.8)
+axis(2, at=nrow(coeff_mat_noNA)+1.2, label="Date of highest growth", las=2, tick=FALSE, cex.axis=0.5, line=-0.8)
 mtext("(95% confidence interval)", side=3, cex=0.5)
 nums <- round(coeff_mat[cbind(1:nrow(coeff_mat),wmax)])
 vars <- round((confint_hi[cbind(1:nrow(coeff_mat),wmax)] - confint_lo[cbind(1:nrow(coeff_mat),wmax)])/2)
@@ -182,7 +215,7 @@ vars <- round((confint_hi[,ncol(confint_hi)] - confint_lo[,ncol(confint_lo)])/2)
 numvars <- paste(nums, ifelse(is.na(nums), "", paste("% (±", vars, ")", sep="")), sep="")
 text(x=2, y=1:nrow(coeff_mat_noNA), numvars[ord], cex=0.5, font=2)
 string_date <- format(as.Date(tail(colnames(coeff_mat_noNA), 1)), format="%B %d")
-text(x=1:2, y=0, label=c("Highest (·)", paste("Current\n(", string_date, ")", sep="")), srt=35, adj=c(1,1), cex=0.6, font=2)
+text(x=1:2, y=0, label=c("Highest (·)", paste("Current\n(", string_date, ")", sep="")), srt=35, adj=c(1,1), cex=0.5, font=2)
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   #system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
@@ -190,4 +223,5 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 }
 
 
+#################
 
