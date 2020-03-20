@@ -74,7 +74,7 @@ rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <-
 
 fix_label("Diamond Princess - Cruise Ship", "Cruise Ship")
 
-to_rm <- which(rownames(confirmed) == "Diamond Princess - US")
+to_rm <- which(rownames(confirmed) %in% c("Diamond Princess - US", "Grand Princess - US"))
 if (!is.null(to_rm)) {
   confirmed <- confirmed[-to_rm,]
   deaths <- deaths[-to_rm,]
