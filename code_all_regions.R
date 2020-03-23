@@ -186,7 +186,7 @@ ord <- order(apply(coeff_mat_noNA, 1, which.max), -apply(coeff_mat_noNA, 1, max)
 fn <- "percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=16, height=10)
 layout(matrix(1:2, ncol=2), widths=c(10,2))
-par(mar=c(3,2,2,6), xpd=T, bg="white")
+par(mar=c(3,2,2,4), xpd=T, bg="white")
 image(x=1:ncol(coeff_mat_noNA), y=1:nrow(coeff_mat_noNA), z=t(coeff_mat_noNA[ord,]), axes=FALSE, xlab="", ylab="",
       breaks=c(-1, seq(0.5, max(coeff_mat_noNA), length.out=99), 100), col=c("grey97", colorpanel(99, "grey90", "#e2ae79")))
 wmax <- apply(coeff_mat_noNA, 1, which.max)
