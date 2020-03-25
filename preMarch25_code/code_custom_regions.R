@@ -14,9 +14,10 @@ dir.create("PNG_figures", recursive=TRUE, showWarnings=FALSE)
 
 # Re-loading original data to undo some of the earlier "corrections" (see code_preprocess.R)
 covid19_dir <- "COVID-19/csse_covid_19_data/csse_covid_19_time_series/"
-confirmed_all <- read.delim(paste(covid19_dir, "time_series_covid19_confirmed_global.csv", sep="/"), sep=",", header=T, as.is=T)
-deaths_all    <- read.delim(paste(covid19_dir, "time_series_covid19_deaths_global.csv",    sep="/"), sep=",", header=T, as.is=T)
-colnames(confirmed_all) <- colnames(deaths_all) <- 
+confirmed_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Confirmed.csv", sep="/"), sep=",", header=T, as.is=T)
+deaths_all    <- read.delim(paste(covid19_dir, "time_series_19-covid-Deaths.csv",    sep="/"), sep=",", header=T, as.is=T)
+recovered_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Recovered.csv", sep="/"), sep=",", header=T, as.is=T)
+colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <-
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
 ### Note that these are currently (March 17, 2020) not properly being reported anymore
@@ -25,28 +26,35 @@ population[nam] <- 7535591
 idxs <- c(grep(", WA$", confirmed_all$Province.State), which(confirmed_all$Province.State == "Washington"));
 confirmed[nam,] <- colSums(confirmed_all[idxs,-c(1:4)])
 deaths[nam,] <- colSums(deaths_all[idxs,-c(1:4)])
+recovered[nam,] <- colSums(recovered_all[idxs,-c(1:4)])
 
 #nam <- "King County, WA"
 #population[nam] <- 2190200
 #idxs <- grep("^King County, WA$", confirmed_all$Province.State);
 #confirmed[nam,] <- colSums(confirmed_all[idxs,-c(1:4)])
 #deaths[nam,] <- colSums(deaths_all[idxs,-c(1:4)])
+#recovered[nam,] <- colSums(recovered_all[idxs,-c(1:4)])
 
 ############################################################################################################################
 
-### Percentage of population with confirmed cases / deaths 
+### Percentage of population with confirmed cases / deaths / recoveries
 confirmed_perc <- sweep(confirmed, 1, population, FUN="/") * 100
 deaths_perc <- sweep(deaths, 1, population, FUN="/") * 100
+recovered_perc <- sweep(recovered, 1, population, FUN="/") * 100
 
-### Percentage of confirmed cases that have resulted in deaths 
+### Percentage of confirmed cases that have resulted in deaths / recoveries
 confirmed_deaths_perc <- deaths / confirmed * 100
+confirmed_recovered_perc <- recovered / confirmed * 100
 confirmed_deaths_perc[confirmed < 100] <- NA # minimum of 100 cases required
+confirmed_recovered_perc[confirmed < 100] <- NA # minimum of 100 cases required
 
 ### Averages across all countries
 confirmed_perc_mean <- colSums(confirmed) / sum(population) * 100
 deaths_perc_mean    <- colSums(deaths)    / sum(population) * 100
+recovered_perc_mean <- colSums(recovered) / sum(population) * 100
 
 confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
+confirmed_recovered_perc_mean <- colSums(recovered) / colSums(confirmed) * 100
 
 # Selection of countries
 #idxs <- which(rownames(confirmed_perc) %in% c("Italy", "King County, WA", "Washington State", "Netherlands"))

@@ -40,6 +40,7 @@ fix_csse_label <- function(lab_old, lab_new) {
   if (length(idx) == 1) {
     confirmed_all[idx,"Country.Region"] <<- lab_new; # global var, yikes!
     deaths_all[idx,"Country.Region"] <<- lab_new; # global var, yikes!
+    recovered_all[idx,"Country.Region"] <<- lab_new; # global var, yikes!
     print(paste("Changed CSSE country label", lab_old, "to", lab_new))
   } else {
     print(paste("Did NOT change CSSE country label", lab_old, "to", lab_new))
@@ -54,8 +55,6 @@ pop_counts <- read.delim(pop_counts_file, skip=3, sep=",", header=T, as.is=T)
 # Simplify data to contain only latest population estimates
 population <- pop_counts[,c("Country.Name", "X2018")] #2019 is missing, so opting for 2018
 colnames(population) <- c("country_pop", "population")
-to_rm <- which(is.na(population$population))
-if (length(to_rm) > 0) population <- population[-to_rm,]
 
 fix_pop_label("Egypt, Arab Rep.", "Egypt")
 fix_pop_label("Macao SAR, China", "Macau")
@@ -87,9 +86,10 @@ colnames(population) <- c("country_pop", "population")
 ############################################################################################################################
 ### Load in COVID-19 case data
 covid19_dir <- "COVID-19/csse_covid_19_data/csse_covid_19_time_series/"
-confirmed_all <- read.delim(paste(covid19_dir, "time_series_covid19_confirmed_global.csv", sep="/"), sep=",", header=T, as.is=T)
-deaths_all    <- read.delim(paste(covid19_dir, "time_series_covid19_deaths_global.csv",    sep="/"), sep=",", header=T, as.is=T)
-colnames(confirmed_all) <- colnames(deaths_all) <- 
+confirmed_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Confirmed.csv", sep="/"), sep=",", header=T, as.is=T)
+deaths_all    <- read.delim(paste(covid19_dir, "time_series_19-covid-Deaths.csv",    sep="/"), sep=",", header=T, as.is=T)
+recovered_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Recovered.csv", sep="/"), sep=",", header=T, as.is=T)
+colnames(confirmed_all) <- colnames(deaths_all) <- colnames(recovered_all) <- 
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
 fix_csse_label("Taipei and environs", "China")
@@ -116,11 +116,13 @@ fix_csse_label("Republic of the Congo", "Congo")
 # Aggregate by country, instead of region, since we only have country-level population data for now.
 confirmed_simple <- aggregate(confirmed_all[,-c(1:4)], by=list(country=confirmed_all$Country.Region), FUN=sum)
 deaths_simple    <- aggregate(deaths_all[,-c(1:4)], by=list(country=deaths_all$Country.Region), FUN=sum)
+recovered_simple <- aggregate(recovered_all[,-c(1:4)], by=list(country=recovered_all$Country.Region), FUN=sum)
 
 # Match population data with COVID-19 data
 match_res     <- match(confirmed_simple$country, population$country_pop)
 confirmed_pop <- cbind(population[match_res,], confirmed_simple)
 deaths_pop    <- cbind(population[match_res,], deaths_simple)
+recovered_pop <- cbind(population[match_res,], recovered_simple)
 
 # All but one country should have been matched -- the unmatched is the Diamond Princess cruise ship.
 to_rm <- which(is.na(confirmed_pop$country_pop))
@@ -131,17 +133,21 @@ if (length(to_rm) > 1) {
 if (length(to_rm) > 0) {
   confirmed_pop <- confirmed_pop[-to_rm,]
   deaths_pop <- deaths_pop[-to_rm,]
+  recovered_pop <- recovered_pop[-to_rm,]
 }
 
 # Final simplification step
 population <- confirmed_pop[,2]
 confirmed <- confirmed_pop[,-c(1:3)]
 deaths <- deaths_pop[,-c(1:3)]
-rownames(confirmed) <- rownames(deaths) <- names(population) <- confirmed_pop[,1]
+recovered <- recovered_pop[,-c(1:3)]
+rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
+  names(population) <- confirmed_pop[,1]
 
 if(all(is.na(confirmed[,ncol(confirmed)]))) {
  confirmed <- confirmed[,-ncol(confirmed)]
  deaths <- deaths[,-ncol(deaths)]
+ recovered <- recovered[,-ncol(recovered)]
 }
 
 idx_undef <- which(is.na(confirmed[,ncol(confirmed)]))

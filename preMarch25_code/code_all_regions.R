@@ -32,6 +32,7 @@ fix_label <- function(lab_old, lab_new) {
   if (length(to_change) == 1) {
     rownames(confirmed)[to_change] <<- lab_new # global var, yikes!
     rownames(deaths)[to_change]    <<- lab_new
+    rownames(recovered)[to_change] <<- lab_new
     print(paste("Changed region label", lab_old, "to", lab_new))
   } else {
     print(paste("Did NOT change region label", lab_old, "to", lab_new))
@@ -49,43 +50,51 @@ dir.create("PNG_figures", recursive=TRUE, showWarnings=FALSE)
 
 # Re-loading original data to get the full dataset
 covid19_dir <- "COVID-19/csse_covid_19_data/csse_covid_19_time_series/"
-confirmed_all <- read.delim(paste(covid19_dir, "time_series_covid19_confirmed_global.csv", sep="/"), sep=",", header=T, as.is=T)
-deaths_all    <- read.delim(paste(covid19_dir, "time_series_covid19_deaths_global.csv",    sep="/"), sep=",", header=T, as.is=T)
+confirmed_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Confirmed.csv", sep="/"), sep=",", header=T, as.is=T)
+deaths_all    <- read.delim(paste(covid19_dir, "time_series_19-covid-Deaths.csv",    sep="/"), sep=",", header=T, as.is=T)
+recovered_all <- read.delim(paste(covid19_dir, "time_series_19-covid-Recovered.csv", sep="/"), sep=",", header=T, as.is=T)
 
 metadata <- confirmed_all[,1:4];
 confirmed <- confirmed_all[,-c(1:4)]
 deaths <- deaths_all[,-c(1:4)]
+recovered <- recovered_all[,-c(1:4)]
 
 if(all(is.na(confirmed[,ncol(confirmed)]))) {
  confirmed <- confirmed[,-ncol(confirmed)]
  deaths <- deaths[,-ncol(deaths)]
+ recovered <- recovered[,-ncol(recovered)]
 }
 
 metadata$Province.State <- ifelse(metadata$Province.State == metadata$Country.Region, "", metadata$Province.State)
 
-colnames(confirmed) <- colnames(deaths) <- as.character(as.Date(colnames(confirmed), format="X%m.%d.%y"))
-rownames(confirmed) <- rownames(deaths) <- 
+colnames(confirmed) <- colnames(deaths) <- colnames(recovered) <- 
+  as.character(as.Date(colnames(confirmed), format="X%m.%d.%y"))
+rownames(confirmed) <- rownames(deaths) <- rownames(recovered) <- 
   gsub("^ - ", "", paste(metadata$Province.State, metadata$Country.Region, sep=" - "))
 
 fix_label("Diamond Princess - Cruise Ship", "Cruise Ship")
 
 to_rm <- which(rownames(confirmed) %in% c("Diamond Princess - US", "Grand Princess - US"))
-if (length(to_rm) > 0) {
+if (!is.null(to_rm)) {
   confirmed <- confirmed[-to_rm,]
   deaths <- deaths[-to_rm,]
+  recovered <- recovered[-to_rm,]
   metadata <- metadata[-to_rm,]
 }
 
 # Aggregate by country, and add as separate data points
 confirmed_agg <- aggregate(confirmed, by=list(country=metadata$Country.Region), FUN=sum)
 deaths_agg <- aggregate(deaths, by=list(country=metadata$Country.Region), FUN=sum)
+recovered_agg <- aggregate(recovered, by=list(country=metadata$Country.Region), FUN=sum)
 
 rownames(confirmed_agg) <- confirmed_agg[,1]; confirmed_agg <- confirmed_agg[,-1];
 rownames(deaths_agg) <- deaths_agg[,1]; deaths_agg <- deaths_agg[,-1];
+rownames(recovered_agg) <- recovered_agg[,1]; recovered_agg <- recovered_agg[,-1];
 
 to_rm <- which(rownames(confirmed_agg) %in% rownames(confirmed))
 confirmed <- rbind(confirmed, confirmed_agg[-to_rm,])
 deaths <- rbind(deaths, deaths_agg[-to_rm,])
+recovered <- rbind(recovered, recovered_agg[-to_rm,])
 
 ### Attempt to parse US state data to be able to include these as well
 state_mapping <- c("Alabama"="AL", "Alaska"="AK", "Arizona"="AZ", "Arkansas"="AR", "California"="CA",
@@ -108,6 +117,7 @@ for (state in names(state_mapping)) {
       if (all(pmin(confirmed[state_lab,], colSums(confirmed[state_counties,], na.rm=T)) == 0)) {
         confirmed[paste(state, "- US"),] <- confirmed[state_lab,] + colSums(confirmed[state_counties,], na.rm=T)
         deaths[paste(state, "- US"),] <- deaths[state_lab,] + colSums(deaths[state_counties,], na.rm=T)
+        recovered[paste(state, "- US"),] <- recovered[state_lab,] + colSums(recovered[state_counties,], na.rm=T)
       } else {
         warning(paste("Potential conflicting state-wide vs. county-wide data for", state, "state"))
       }
@@ -194,7 +204,7 @@ wmax <- apply(coeff_mat, 1, which.max)
 max_dates <- format(as.Date(colnames(coeff_mat)[wmax][ord]), format="%B %d, %Y")
 axis(2, at=1:nrow(coeff_mat_noNA), label=max_dates, las=2, tick=FALSE, cex.axis=0.4, line=-0.8)
 axis(2, at=nrow(coeff_mat_noNA)+1.2, label="Date of highest growth", las=2, tick=FALSE, cex.axis=0.4, line=-0.8)
-mtext("(95% confidence interval)", side=3, cex=0.4, line=-0.1)
+mtext("(95% confidence interval)", side=3, cex=0.4)
 nums <- round(coeff_mat[cbind(1:nrow(coeff_mat),wmax)])
 vars <- round((confint_hi[cbind(1:nrow(coeff_mat),wmax)] - confint_lo[cbind(1:nrow(coeff_mat),wmax)])/2)
 numvars <- paste(nums, ifelse(is.na(nums), "", paste("% (±", vars, ")", sep="")), sep="")
