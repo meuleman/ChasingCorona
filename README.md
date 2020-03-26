@@ -32,6 +32,14 @@ Percentages on the right are 10-day average daily growth rates for the most rece
 This growth over time can be further generalized across all countries and regions with sufficient data points, as such:
 ![perc. daily confirmed new cases, all](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning_latest.png "% daily confirmed new cases, all")
 
+#### Percentage of population that has died of COVID-19
+
+Shown are the top 20 countries in terms of highest percent of population died from COVID-19.
+
+![perc. of population deaths](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_deaths_top20_min25_fromMar01_latest.png.png "% of per-country population that has died of COVID-19")
+
+Data are shown on a linear and a logarithmic scale, because of the observed exponential growth of the number of deaths.
+
 
 #### Additional figures
 
