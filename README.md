@@ -15,7 +15,7 @@ We do not nearly have enough data to make precise estimates, in particular becau
 
 This is essentially the Johns Hopkins University per-country [data](https://github.com/CSSEGISandData/COVID-19) for "confirmed cases", 
 divided by the per-country 2018 population counts, as estimated and provided by the [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL).
-Shown are the top 20 countries in terms of highest percent population confirmed to be COVID-19 cases.
+Shown are the top 20 countries in terms of percent population confirmed to be COVID-19 cases.
 
 ![perc. of population confirmed](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_confirmed_top20_min100_fromMar01_latest.png "% of per-country population that are confirmed cases")
 
@@ -34,7 +34,7 @@ This growth over time can be further generalized across all countries and region
 
 #### Percentage of population that has died of COVID-19
 
-Shown are the top 20 countries in terms of highest percent of population died from COVID-19.
+Shown are the top 20 countries in terms of percent of population died from COVID-19.
 
 ![perc. of population deaths](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_deaths_top20_min25_fromMar01_latest.png "% of per-country population that has died of COVID-19")
 
