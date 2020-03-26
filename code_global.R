@@ -28,6 +28,7 @@ confirmed_deaths_perc_mean <- colSums(deaths) / colSums(confirmed) * 100
 
 # Obtain "top-scoring" countries, in terms of percentage of population affected (min. 100 cases)
 min_cases_100 <- which(apply(confirmed, 1, max, na.rm=T) > 100) # to accommodate NAs
+min_deaths_25 <- which(apply(deaths, 1, max, na.rm=T) > 25) # to accommodate NAs
 min_pop_100 <- which(population > 100000)
 #idxs <- head(order(-confirmed_perc[,ncol(confirmed_perc)]), 9)
 #cols <- brewer.pal(9, "Set1")
@@ -198,7 +199,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 
 
 # Top 20 countries in terms of percentage of population deaths
-idxs <- head(intersect(intersect(order(-apply(deaths_perc, 1, max, na.rm=T)), min_cases_100), min_pop_100), 20)
+idxs <- head(intersect(intersect(order(-apply(deaths_perc, 1, max, na.rm=T)), min_deaths_25), min_pop_100), 20)
 
 fn <- "percentage_population_deaths_top20_min100_fromMar01"
 xlim <- as.Date(c("2020-03-01", tail(colnames(deaths_perc), 1)))
