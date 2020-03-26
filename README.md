@@ -63,7 +63,7 @@ Number of confirmed cases (for the matching top20 %population countries shown ab
 ![number of confirmed cases per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_top20_min100_fromBeginning_latest.png "number of confirmed COVID-19 cases per country")
 
 Number of deaths (for the matching top20 %population countries shown above)
-![number of deaths per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_deaths_top20_min100_fromBeginning_latest.png "number of deaths due to COVID-19 per country")
+![number of deaths per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_deaths_top20_min25_fromBeginning_latest.png "number of deaths due to COVID-19 per country")
 
 
 
