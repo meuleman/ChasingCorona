@@ -59,8 +59,11 @@ Population-normalized view for King County, Washington State (where I live) and 
 ![perc. of population confirmed, selection](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/percentage_population_confirmed_custom_latest.png "% of per-country population that are confirmed cases, selection")
 -->
 
-Number of confirmed cases on a logarithmic scale:
+Number of confirmed cases (for the matching top20 %population countries shown above)
 ![number of confirmed cases per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_top20_min100_fromBeginning_latest.png "number of confirmed COVID-19 cases per country")
+
+Number of deaths (for the matching top20 %population countries shown above)
+![number of deaths per country](https://raw.githubusercontent.com/meuleman/ChasingCorona/master/PNG_figures/absolute_numbers_deaths_top20_min100_fromBeginning_latest.png "number of deaths due to COVID-19 per country")
 
 
 
