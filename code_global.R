@@ -201,7 +201,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
 # Top 20 countries in terms of percentage of population deaths
 idxs <- head(intersect(intersect(order(-apply(deaths_perc, 1, max, na.rm=T)), min_deaths_25), min_pop_100), 20)
 
-fn <- "percentage_population_deaths_top20_min100_fromMar01"
+fn <- "percentage_population_deaths_top20_min25_fromMar01"
 xlim <- as.Date(c("2020-03-01", tail(colnames(deaths_perc), 1)))
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_population_percentages(deaths_perc, deaths_perc_mean, idxs, cols, xlim=xlim)
@@ -210,7 +210,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_population_deaths_top20_min100_fromFeb15"
+fn <- "percentage_population_deaths_top20_min25_fromFeb15"
 xlim <- as.Date(c("2020-02-15", tail(colnames(deaths_perc), 1)))
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_population_percentages(deaths_perc, deaths_perc_mean, idxs, cols, xlim=xlim)
@@ -219,7 +219,7 @@ if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   system(paste("convert -density 144 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
 }
 
-fn <- "percentage_population_deaths_top20_min100_fromBeginning"
+fn <- "percentage_population_deaths_top20_min25_fromBeginning"
 plotfile(paste(figdir, fn, sep="/"), type="pdf", width=22, height=8)
 plot_population_percentages(deaths_perc, deaths_perc_mean, idxs, cols)
 dev.off()
