@@ -94,6 +94,10 @@ deaths_all    <- read.delim(paste(covid19_dir, "time_series_covid19_deaths_globa
 colnames(confirmed_all) <- colnames(deaths_all) <- #colnames(recovered_all) <- 
   c(colnames(confirmed_all)[1:4], as.character(as.Date(colnames(confirmed_all)[-c(1:4)], format="X%m.%d.%y")))
 
+# Alternative data source, if needed at some point (e.g. for per-county level data):
+# https://github.com/coviddata/covid-api
+# https://coviddata.github.io/covid-api/
+
 fix_csse_label("Taipei and environs", "China")
 fix_csse_label("Macao SAR", "China")
 fix_csse_label("Taiwan*", "China")
