@@ -54,6 +54,16 @@ confirmed_all <- read.delim(paste(covid19_dir, "time_series_covid19_confirmed_gl
 deaths_all    <- read.delim(paste(covid19_dir, "time_series_covid19_deaths_global.csv",    sep="/"), sep=",", header=T, as.is=T)
 #recovered_all    <- read.delim(paste(covid19_dir, "time_series_covid19_recovered_global.csv",    sep="/"), sep=",", header=T, as.is=T)
 
+confirmed_US_all <- read.delim(paste(covid19_dir, "time_series_covid19_confirmed_US.csv", sep="/"), sep=",", header=T, as.is=T)
+deaths_US_all    <- read.delim(paste(covid19_dir, "time_series_covid19_deaths_US.csv",    sep="/"), sep=",", header=T, as.is=T)
+confirmed_US_all <- confirmed_US_all[,-c(1:6,11)]
+deaths_US_all    <- deaths_US_all[,-c(1:6,11)]
+colnames(confirmed_US_all) <- colnames(confirmed_all[,1:ncol(confirmed_US_all)])
+colnames(deaths_US_all) <- colnames(deaths_all[,1:ncol(deaths_US_all)])
+
+confirmed_all <- rbind(confirmed_all[,1:ncol(confirmed_US_all)], confirmed_US_all)
+deaths_all <- rbind(deaths_all[,1:ncol(deaths_US_all)], deaths_US_all)
+
 metadata <- confirmed_all[,1:4];
 confirmed <- confirmed_all[,-c(1:4)]
 deaths <- deaths_all[,-c(1:4)]
@@ -184,17 +194,17 @@ coeff_mat_noNA <- coeff_mat_noNA[,colSums(coeff_mat_noNA) > 0]
 ord <- order(apply(coeff_mat_noNA, 1, which.max), -apply(coeff_mat_noNA, 1, max), decreasing=TRUE)
 
 fn <- "percentage_daily_change_10days_cases_confirmed_ALL_fromBeginning"
-plotfile(paste(figdir, fn, sep="/"), type="pdf", width=16, height=14)
+plotfile(paste(figdir, fn, sep="/"), type="pdf", width=16, height=11)
 layout(matrix(1:2, ncol=2), widths=c(10,2))
-par(mar=c(3,2,2,4), xpd=T, bg="white",cex=0.7)
+par(mar=c(3,2,2,4), xpd=T, bg="white")
 image(x=1:ncol(coeff_mat_noNA), y=1:nrow(coeff_mat_noNA), z=t(coeff_mat_noNA[ord,]), axes=FALSE, xlab="", ylab="",
       breaks=c(-1, seq(0.5, max(coeff_mat_noNA), length.out=99), 100), col=c("grey97", colorpanel(99, "grey90", "#e2ae79")))
 wmax <- apply(coeff_mat_noNA, 1, which.max)
 points(wmax[ord], 1:nrow(coeff_mat_noNA), pch=16, cex=0.2)
 axis(4, at=1:nrow(coeff_mat_noNA), label=rownames(coeff_mat_noNA)[ord], las=2, tick=FALSE, cex.axis=0.4, line=-0.8)
 text(x=1:ncol(coeff_mat_noNA), y=0, label=as.Date(colnames(coeff_mat_noNA)), srt=35, adj=c(1,1), cex=0.5)
-mtext("Percent daily growth of number of confirmed cases", side=3, line=0.1, adj=0, cex=0.7)
-mtext(paste("(estimated across", nrange, "day intervals, requiring 10+ cases per day)"), side=3, line=0.1, adj=1, cex=0.5, col="darkgrey")
+mtext("Percent daily growth of number of confirmed cases", side=3, line=0.1, adj=0)
+mtext(paste("(estimated across", nrange, "day intervals, requiring 10+ cases per day)"), side=3, line=0.1, adj=1, cex=0.8, col="darkgrey")
 par(mar=c(3,4,2,1), xpd=T, bg="white")
 image(x=1:2, y=1:nrow(coeff_mat_noNA), z=t(cbind(apply(coeff_mat_noNA, 1, max), coeff_mat_noNA[,ncol(coeff_mat_noNA)])[ord,]), 
       axes=FALSE, xlab="", ylab="",
@@ -218,7 +228,7 @@ text(x=1:2, y=0, label=c("Highest (·)", paste("Current\n(", string_date, ")", s
 par(new=T, xpd=T)
 par(mfrow=c(1,1))
 plot(0, type="n", axes=FALSE, xlab="", ylab="")
-legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.55, inset=c(0.12,-0.06))
+legend("bottomright", "(x,y)", "@nameluem\nwww.meuleman.org", text.col="grey", bty="n", cex=0.75, inset=c(0.128,-0.05))
 dev.off()
 if (file.exists(paste(figdir, "/", fn, "_", id(), ".pdf", sep=""))) {
   #system(paste("convert -density 300 ", figdir, "/", fn, "_", id(), ".pdf PNG_figures/", fn, "_latest.png", sep=""))
